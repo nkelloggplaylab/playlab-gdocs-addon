@@ -1,0 +1,3785 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=1440" />
+<title>Playlab for Google Docs — Prototype</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Google+Sans+Text:wght@400;500;700&family=Lexend:wght@300;400;500;600;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --playlab-yellow: #FFC600;
+    --playlab-yellow-soft: #FFF6D9;
+    --playlab-blue: #01B1E2;
+    --playlab-sky: #0EA5E9;
+    --playlab-sky-soft: #E0F2FE;
+    --playlab-green: #00CD72;
+    --playlab-pink: #F21DB7;
+    --playlab-red: #FF0C26;
+    --playlab-dark: #122134;
+    --playlab-gray: #767D86;
+    --playlab-bg: #EFF5F5;
+    --gdocs-blue: #1a73e8;
+    --gdocs-border: #dadce0;
+    --gdocs-bg: #f9fbfd;
+    --gdocs-page-bg: #ffffff;
+    --gdocs-text: #202124;
+    --gdocs-gray: #5f6368;
+  }
+
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0;
+    height: 100%;
+    background: var(--gdocs-bg);
+    font-family: 'Roboto', 'Google Sans Text', sans-serif;
+    color: var(--gdocs-text);
+    overflow: hidden;
+  }
+
+  /* ============ GOOGLE DOCS CHROME ============ */
+  .app {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+  }
+
+  .gdocs-header {
+    background: white;
+    border-bottom: 1px solid var(--gdocs-border);
+    padding: 8px 16px 0;
+    flex-shrink: 0;
+  }
+
+  .gdocs-title-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .gdocs-logo {
+    width: 40px; height: 40px;
+    background: #4285f4;
+    border-radius: 4px;
+    display: flex; align-items: center; justify-content: center;
+    color: white; font-weight: 700; font-size: 18px;
+    font-family: 'Google Sans Text', sans-serif;
+    position: relative;
+  }
+  .gdocs-logo::after {
+    content: "";
+    position: absolute;
+    top: 0; right: 0;
+    width: 12px; height: 12px;
+    background: #a8c7fa;
+    clip-path: polygon(0 0, 100% 100%, 100% 0);
+  }
+
+  .gdocs-title-block { flex: 1; }
+  .gdocs-doc-title {
+    font-family: 'Google Sans Text', sans-serif;
+    font-size: 18px;
+    color: var(--gdocs-text);
+    padding: 4px 8px;
+    border-radius: 4px;
+    display: inline-block;
+    cursor: text;
+  }
+  .gdocs-doc-title:hover { background: #f1f3f4; }
+  .gdocs-shared-badge {
+    display: none;
+    font-size: 11px;
+    color: var(--gdocs-gray);
+    margin-left: 4px;
+    padding: 2px 8px;
+    background: #f1f3f4;
+    border-radius: 999px;
+  }
+  body[data-view="teacher"] .gdocs-shared-badge { display: inline-block; }
+
+  .gdocs-menubar {
+    display: flex;
+    gap: 4px;
+    margin-top: 2px;
+    font-size: 13px;
+    color: var(--gdocs-gray);
+  }
+  .gdocs-menubar span {
+    padding: 4px 8px;
+    border-radius: 4px;
+    cursor: default;
+  }
+  .gdocs-menubar span:hover { background: #f1f3f4; }
+
+  .gdocs-header-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-left: auto;
+  }
+  .gdocs-btn {
+    padding: 8px 16px;
+    border-radius: 20px;
+    background: var(--gdocs-blue);
+    color: white;
+    font-size: 13px;
+    font-weight: 500;
+    font-family: 'Google Sans Text', sans-serif;
+    border: none;
+    cursor: pointer;
+  }
+  .gdocs-icon-btn {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    background: #f1f3f4;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--gdocs-gray);
+    cursor: pointer;
+    font-size: 14px;
+  }
+  .gdocs-avatar {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #8e24aa, #d81b60);
+    color: white;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 500;
+    font-size: 13px;
+    font-family: 'Google Sans Text', sans-serif;
+  }
+  body[data-view="teacher"] .gdocs-avatar {
+    background: linear-gradient(135deg, #0ea5e9, #0369a1);
+  }
+
+  .gdocs-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 16px;
+    background: #edf2fa;
+    border-radius: 24px;
+    margin: 8px 16px 10px;
+    font-size: 13px;
+    color: var(--gdocs-gray);
+    flex-wrap: wrap;
+  }
+  .tb-group {
+    display: flex; align-items: center; gap: 2px;
+    padding: 0 6px;
+    border-right: 1px solid #d2dbe8;
+  }
+  .tb-group:last-child { border-right: none; }
+  .tb-item {
+    padding: 4px 8px;
+    border-radius: 4px;
+    cursor: default;
+    user-select: none;
+  }
+  .tb-item:hover { background: rgba(0,0,0,0.05); }
+  .tb-item.dropdown::after {
+    content: " ▾";
+    font-size: 9px;
+    margin-left: 2px;
+  }
+
+  /* ============ BODY ============ */
+  .gdocs-body {
+    flex: 1;
+    display: flex;
+    overflow: hidden;
+  }
+
+  .gdocs-canvas {
+    flex: 1;
+    overflow-y: auto;
+    padding: 32px 0 120px;
+    background: var(--gdocs-bg);
+    position: relative;
+  }
+
+  /* Submitted banner for teacher view */
+  .submitted-banner {
+    display: none;
+    width: 816px;
+    max-width: calc(100% - 64px);
+    margin: 0 auto 12px;
+    padding: 10px 16px;
+    background: #fff6d9;
+    border: 1px solid #f0e4b5;
+    border-radius: 8px;
+    font-family: 'Google Sans Text', sans-serif;
+    font-size: 13px;
+    color: #5f4a00;
+    align-items: center;
+    gap: 10px;
+  }
+  .submitted-banner strong { font-weight: 500; color: #3b2e00; }
+  .submitted-banner .student-pill {
+    background: white;
+    border: 1px solid #f0e4b5;
+    padding: 2px 8px;
+    border-radius: 999px;
+    font-size: 12px;
+    color: #3b2e00;
+  }
+  body[data-view="teacher"] .submitted-banner { display: flex; }
+
+  .page-and-margin {
+    display: flex;
+    gap: 24px;
+    width: 1080px;
+    max-width: calc(100% - 32px);
+    margin: 0 auto;
+    align-items: flex-start;
+  }
+  .gdocs-page {
+    width: 816px;
+    min-height: 1056px;
+    background: white;
+    box-shadow: 0 1px 3px rgba(60,64,67,0.15), 0 4px 8px 3px rgba(60,64,67,0.07);
+    padding: 96px 96px 96px 96px;
+    font-family: 'Arial', sans-serif;
+    font-size: 11pt;
+    line-height: 1.5;
+    color: var(--gdocs-text);
+    flex-shrink: 0;
+  }
+
+  /* Right margin for Google Docs-style comments */
+  .gdocs-margin {
+    width: 240px;
+    flex-shrink: 0;
+    padding-top: 180px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .gdocs-comment {
+    display: none;
+    background: white;
+    border: 1px solid #dadce0;
+    border-radius: 8px;
+    padding: 12px 14px;
+    box-shadow: 0 1px 2px rgba(60,64,67,0.1);
+    font-family: 'Google Sans Text', sans-serif;
+    font-size: 12.5px;
+    line-height: 1.45;
+    color: var(--gdocs-text);
+    position: relative;
+    animation: slideIn 400ms ease;
+  }
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateX(12px); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+  body[data-step="7"] .gdocs-comment.show-step-7 { display: block; }
+
+  .gdocs-comment::before {
+    content: "";
+    position: absolute;
+    left: -12px; top: 20px;
+    width: 0; height: 0;
+    border-top: 6px solid transparent;
+    border-bottom: 6px solid transparent;
+    border-right: 12px solid white;
+    filter: drop-shadow(-1px 0 0 #dadce0);
+  }
+  .gdocs-comment-head {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 6px;
+  }
+  .gdocs-comment-avatar {
+    width: 24px; height: 24px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #0ea5e9, #0369a1);
+    color: white;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 500;
+    font-size: 11px;
+  }
+  .gdocs-comment-name { font-weight: 500; font-size: 12px; }
+  .gdocs-comment-time { font-size: 11px; color: var(--gdocs-gray); margin-left: auto; }
+  .gdocs-comment-body { color: #202124; }
+  .gdocs-comment-footer {
+    margin-top: 8px;
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    color: var(--gdocs-gray);
+    font-size: 11.5px;
+  }
+  .gdocs-comment-footer .chip {
+    background: #e8f0fe;
+    color: #1967d2;
+    padding: 2px 8px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 500;
+  }
+  .gdocs-comment-footer .playlab-origin {
+    background: #fff6d9;
+    color: #7a5a00;
+    padding: 2px 8px;
+    border-radius: 999px;
+    font-size: 10.5px;
+    font-weight: 500;
+  }
+
+  .doc-title {
+    font-size: 26pt;
+    font-weight: 400;
+    color: #000;
+    margin: 0 0 4px;
+    line-height: 1.3;
+  }
+  .doc-byline {
+    font-size: 11pt;
+    color: #666;
+    margin-bottom: 28px;
+  }
+  .doc-p {
+    margin: 0 0 12px;
+    text-indent: 0.5in;
+  }
+
+  /* Highlighting for AI-selected text */
+  .hl { transition: background 400ms ease; }
+  body[data-step="2"] .hl-thesis {
+    background: #fff6d9;
+    box-shadow: 0 0 0 1px #ffc600 inset;
+    border-radius: 2px;
+    padding: 1px 2px;
+    margin: -1px -2px;
+  }
+  body[data-step="3"] .hl-thesis {
+    background: #d1fae5;
+    box-shadow: 0 0 0 1px #10b981 inset;
+    border-radius: 2px;
+    padding: 1px 2px;
+    margin: -1px -2px;
+    animation: flash 800ms ease;
+  }
+  body[data-step="4"] .hl-evidence {
+    background: #e0f2fe;
+    box-shadow: 0 0 0 1px #0ea5e9 inset;
+    border-radius: 2px;
+    padding: 1px 2px;
+    margin: -1px -2px;
+  }
+  /* Teacher view keeps a persistent "revised-with-Playlab" marker on the thesis */
+  body[data-view="teacher"] .hl-thesis {
+    background: linear-gradient(180deg, transparent 60%, #fff6d9 60%);
+    cursor: help;
+  }
+  body[data-step="7"] .hl-thesis {
+    background: #e8f0fe;
+    border-radius: 2px;
+    padding: 1px 2px;
+    margin: -1px -2px;
+  }
+
+  @keyframes flash {
+    0% { background: #ffc600; }
+    100% { background: #d1fae5; }
+  }
+
+  .thesis-original { display: inline; }
+  .thesis-revised { display: none; }
+  body[data-step="3"] .thesis-original,
+  body[data-step="4"] .thesis-original,
+  body[data-view="teacher"] .thesis-original { display: none; }
+  body[data-step="3"] .thesis-revised,
+  body[data-step="4"] .thesis-revised,
+  body[data-view="teacher"] .thesis-revised { display: inline; }
+
+  /* Cursor */
+  .doc-cursor {
+    display: inline-block;
+    width: 1px;
+    height: 1em;
+    background: #1a73e8;
+    vertical-align: -2px;
+    animation: blink 1s steps(2) infinite;
+  }
+  @keyframes blink { 50% { opacity: 0; } }
+  body[data-view="teacher"] .doc-cursor { display: none; }
+
+  /* ============ PLAYLAB SIDEBAR ============ */
+  .pl-sidebar {
+    width: 400px;
+    flex-shrink: 0;
+    background: white;
+    border-left: 1px solid var(--gdocs-border);
+    display: flex;
+    flex-direction: column;
+    font-family: 'Lexend', sans-serif;
+    box-shadow: -2px 0 8px rgba(0,0,0,0.04);
+  }
+
+  .pl-header {
+    padding: 14px 18px;
+    border-bottom: 1px solid #e8eef0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: white;
+  }
+  .pl-brand {
+    display: flex; align-items: center; gap: 10px;
+    font-family: 'Lexend', sans-serif;
+    font-weight: 600;
+    font-size: 16px;
+    color: var(--playlab-dark);
+  }
+  .pl-logo {
+    width: 28px; height: 28px;
+    border-radius: 8px;
+    background: var(--playlab-yellow);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.08);
+  }
+  .pl-wordmark {
+    font-weight: 700;
+    letter-spacing: -0.01em;
+  }
+  .pl-wordmark .p1 { color: #01B1E2; }
+  .pl-wordmark .p2 { color: #FF0C26; }
+  .pl-wordmark .p3 { color: #FFC600; }
+  .pl-wordmark .p4 { color: #00CD72; }
+  .pl-wordmark .p5 { color: #F21DB7; }
+  .pl-wordmark .p6 { color: #01B1E2; }
+  .pl-wordmark .p7 { color: #FF0C26; }
+
+  .pl-header-actions {
+    display: flex; gap: 6px;
+  }
+  .pl-icon-btn {
+    width: 30px; height: 30px;
+    border-radius: 8px;
+    background: transparent;
+    border: none;
+    color: var(--playlab-gray);
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 15px;
+  }
+  .pl-icon-btn:hover { background: #f4f7f8; }
+
+  /* App banner — morphs for student vs teacher */
+  .pl-app-banner {
+    padding: 14px 18px 10px;
+    background: linear-gradient(135deg, #FFF6D9 0%, #fffbea 100%);
+    border-bottom: 1px solid #f0e4b5;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  body[data-view="teacher"] .pl-app-banner {
+    background: linear-gradient(135deg, #E0F2FE 0%, #f0f9ff 100%);
+    border-bottom-color: #bae6fd;
+  }
+  .pl-app-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .pl-app-icon {
+    width: 42px; height: 42px;
+    border-radius: 10px;
+    background: white;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    flex-shrink: 0;
+  }
+  .pl-app-meta { flex: 1; min-width: 0; }
+  .pl-app-name {
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--playlab-dark);
+    line-height: 1.2;
+  }
+  .pl-app-author {
+    font-size: 11.5px;
+    color: var(--playlab-gray);
+    margin-top: 2px;
+  }
+  .pl-app-switch {
+    font-size: 11px;
+    color: var(--playlab-sky);
+    font-weight: 500;
+    background: white;
+    border: 1px solid #e2e8f0;
+    padding: 5px 10px;
+    border-radius: 999px;
+    cursor: pointer;
+  }
+  .pl-app-switch:hover { background: #f0f9ff; }
+
+  /* Verified / District-app quality badge */
+  .pl-verified {
+    display: inline-block;
+    font-family: 'Lexend', sans-serif;
+    font-size: 9.5px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    padding: 2px 7px;
+    border-radius: 999px;
+    background: #d1fae5;
+    color: #047857;
+    vertical-align: 2px;
+    margin-left: 6px;
+    text-transform: uppercase;
+    cursor: help;
+  }
+  body[data-view="teacher"] .pl-verified {
+    background: #e0f2fe;
+    color: #0369a1;
+  }
+
+  /* Quick actions row (student = options · teacher = actionable stats) */
+  .pl-quick-actions {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+  .pl-quick-action {
+    font-family: 'Lexend', sans-serif;
+    font-size: 11.5px;
+    font-weight: 500;
+    padding: 5px 11px;
+    border-radius: 999px;
+    background: white;
+    color: var(--playlab-dark);
+    border: 1px solid rgba(0,0,0,0.08);
+    cursor: pointer;
+    transition: all 120ms;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+  }
+  .pl-quick-action:hover {
+    background: var(--playlab-yellow);
+    border-color: var(--playlab-yellow);
+  }
+  body[data-view="teacher"] .pl-quick-action:hover {
+    background: var(--playlab-sky);
+    color: white;
+    border-color: var(--playlab-sky);
+  }
+  .pl-stat-num {
+    font-weight: 700;
+    color: var(--playlab-dark);
+    font-size: 12.5px;
+  }
+  body[data-view="teacher"] .pl-quick-action:hover .pl-stat-num { color: white; }
+  .pl-stat-alert .pl-stat-num { color: var(--playlab-red); }
+  .pl-stat-alert {
+    border-color: rgba(255,12,38,0.2);
+    background: rgba(255,12,38,0.04);
+  }
+
+  /* References strip — Playlab-authentic: teacher-uploaded context */
+  .pl-references {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    color: #7a5a00;
+    flex-wrap: wrap;
+  }
+  body[data-view="teacher"] .pl-references { color: #0369a1; }
+  .pl-references-label {
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-size: 10px;
+    opacity: 0.75;
+  }
+  .pl-reference-chip {
+    background: white;
+    border: 1px solid rgba(0,0,0,0.08);
+    padding: 3px 8px;
+    border-radius: 999px;
+    font-size: 10.5px;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .pl-reference-chip::before {
+    content: "📎";
+    font-size: 10px;
+  }
+
+  /* Student-only app view */
+  .pl-app-student { display: flex; }
+  .pl-app-teacher { display: none; }
+  body[data-view="teacher"] .pl-app-student { display: none; }
+  body[data-view="teacher"] .pl-app-teacher { display: flex; }
+
+  /* Chat */
+  .pl-chat {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px 18px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .pl-msg {
+    display: flex;
+    gap: 10px;
+    max-width: 100%;
+    animation: fadeIn 300ms ease;
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(4px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .pl-msg.user {
+    flex-direction: row-reverse;
+  }
+  .pl-avatar {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px;
+    font-weight: 600;
+  }
+  .pl-avatar.bot {
+    background: var(--playlab-yellow);
+    color: var(--playlab-dark);
+  }
+  .pl-avatar.bot-teacher {
+    background: var(--playlab-sky);
+    color: white;
+  }
+  .pl-avatar.user {
+    background: linear-gradient(135deg, #8e24aa, #d81b60);
+    color: white;
+    font-size: 12px;
+  }
+  .pl-avatar.user-teacher {
+    background: linear-gradient(135deg, #0ea5e9, #0369a1);
+    color: white;
+    font-size: 12px;
+  }
+  .pl-bubble {
+    padding: 10px 14px;
+    border-radius: 14px;
+    font-size: 13.5px;
+    line-height: 1.5;
+    max-width: 290px;
+  }
+  .pl-bubble.bot {
+    background: #f4f7f8;
+    color: var(--playlab-dark);
+    border-bottom-left-radius: 4px;
+  }
+  .pl-bubble.user {
+    background: var(--playlab-sky);
+    color: white;
+    border-bottom-right-radius: 4px;
+  }
+  .pl-bubble p { margin: 0 0 8px; }
+  .pl-bubble p:last-child { margin: 0; }
+  .pl-bubble strong { color: var(--playlab-dark); }
+  .pl-bubble ul { margin: 4px 0 8px; padding-left: 18px; }
+  .pl-bubble li { margin-bottom: 2px; }
+
+  /* Context chip */
+  .pl-context-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: #fff6d9;
+    border: 1px solid #f0e4b5;
+    color: #8a6d00;
+    font-size: 11.5px;
+    padding: 4px 10px;
+    border-radius: 999px;
+    margin-bottom: 8px;
+    font-weight: 500;
+  }
+  .pl-context-chip::before {
+    content: "";
+    width: 8px; height: 8px;
+    background: var(--playlab-yellow);
+    border-radius: 2px;
+  }
+  .pl-context-chip.blue {
+    background: #e0f2fe;
+    border-color: #bae6fd;
+    color: #0369a1;
+  }
+  .pl-context-chip.blue::before { background: var(--playlab-sky); }
+  .pl-context-chip.green {
+    background: #d1fae5;
+    border-color: #a7f3d0;
+    color: #047857;
+  }
+  .pl-context-chip.green::before { background: var(--playlab-green); }
+
+  /* Suggestion card */
+  .pl-suggestion {
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-left: 3px solid var(--playlab-sky);
+    border-radius: 10px;
+    padding: 12px 14px;
+    margin: 8px 0 4px;
+    font-size: 13px;
+    color: var(--playlab-dark);
+    font-family: 'Arial', sans-serif;
+    line-height: 1.55;
+  }
+  .pl-suggestion-label {
+    font-family: 'Lexend', sans-serif;
+    font-size: 10.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-weight: 600;
+    color: var(--playlab-sky);
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .pl-suggestion-actions {
+    display: flex;
+    gap: 6px;
+    margin-top: 10px;
+    flex-wrap: wrap;
+  }
+  .pl-suggestion-btn {
+    font-family: 'Lexend', sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+    padding: 6px 12px;
+    border-radius: 8px;
+    border: 1px solid var(--playlab-sky);
+    background: var(--playlab-sky);
+    color: white;
+    cursor: pointer;
+    transition: all 150ms;
+  }
+  .pl-suggestion-btn:hover { background: #0284c7; border-color: #0284c7; }
+  .pl-suggestion-btn.secondary {
+    background: white;
+    color: var(--playlab-sky);
+  }
+  .pl-suggestion-btn.secondary:hover { background: #f0f9ff; }
+
+  /* Rubric criterion card (teacher view) */
+  .pl-rubric-card {
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 12px 14px;
+    margin-bottom: 10px;
+  }
+  .pl-rubric-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 6px;
+  }
+  .pl-rubric-criterion {
+    font-family: 'Lexend', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--playlab-dark);
+  }
+  .pl-rubric-level {
+    font-family: 'Lexend', sans-serif;
+    font-size: 10.5px;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 999px;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+  }
+  .pl-rubric-level.meets { background: #d1fae5; color: #047857; }
+  .pl-rubric-level.developing { background: #fff6d9; color: #8a6d00; }
+  .pl-rubric-level.exceeds { background: #e0f2fe; color: #0369a1; }
+  .pl-rubric-comment {
+    font-family: 'Arial', sans-serif;
+    font-size: 12.5px;
+    color: var(--playlab-dark);
+    line-height: 1.5;
+    background: #fafbfc;
+    padding: 8px 10px;
+    border-radius: 6px;
+    border-left: 2px solid #cbd5e1;
+  }
+  .pl-rubric-actions {
+    display: flex;
+    gap: 6px;
+    margin-top: 8px;
+    font-family: 'Lexend', sans-serif;
+    font-size: 11.5px;
+  }
+  .pl-rubric-insert {
+    background: var(--playlab-sky);
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 6px;
+    font-weight: 500;
+    cursor: pointer;
+  }
+  .pl-rubric-insert:hover { background: #0284c7; }
+  .pl-rubric-insert.inserted {
+    background: #d1fae5;
+    color: #047857;
+    pointer-events: none;
+  }
+  .pl-rubric-insert.inserted::before { content: "✓ "; }
+  .pl-rubric-edit {
+    background: white;
+    color: var(--playlab-gray);
+    border: 1px solid #e2e8f0;
+    padding: 5px 10px;
+    border-radius: 6px;
+    font-weight: 500;
+    cursor: pointer;
+  }
+
+  /* Integrity framework card — the differentiator moment */
+  .pl-framework {
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-top: 3px solid var(--playlab-yellow);
+    border-radius: 10px;
+    padding: 12px 14px;
+    margin: 8px 0 4px;
+  }
+  .pl-framework-title {
+    font-family: 'Lexend', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--playlab-dark);
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .pl-framework-title::before {
+    content: "🧭";
+    font-size: 14px;
+  }
+  .pl-framework-move {
+    display: grid;
+    grid-template-columns: 60px 1fr;
+    gap: 10px;
+    padding: 8px 0;
+    border-top: 1px dashed #e2e8f0;
+    align-items: start;
+  }
+  .pl-framework-move:first-of-type { border-top: none; padding-top: 4px; }
+  .pl-move-label {
+    font-family: 'Lexend', sans-serif;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    color: var(--playlab-gray);
+    text-transform: uppercase;
+    padding-top: 3px;
+  }
+  .pl-move-quote {
+    font-family: 'Arial', sans-serif;
+    font-size: 12.5px;
+    color: var(--playlab-dark);
+    line-height: 1.45;
+  }
+  .pl-move-quote em {
+    background: #fff6d9;
+    padding: 1px 4px;
+    border-radius: 3px;
+    font-style: normal;
+    font-weight: 500;
+  }
+  .pl-move-source {
+    font-family: 'Lexend', sans-serif;
+    font-size: 10.5px;
+    color: var(--playlab-gray);
+    margin-top: 2px;
+  }
+  .pl-framework-footer {
+    font-family: 'Lexend', sans-serif;
+    font-size: 12px;
+    color: var(--playlab-dark);
+    background: #fffbea;
+    border-radius: 6px;
+    padding: 8px 10px;
+    margin-top: 8px;
+    font-weight: 500;
+  }
+
+  /* Student-typed thesis (shows Maya's own voice, less polished) */
+  .thesis-revised {
+    /* keep it slightly highlighted to show it's her revision */
+  }
+
+  /* Process stat card */
+  .pl-stat-card {
+    background: linear-gradient(135deg, #fffbea 0%, #fff6d9 100%);
+    border: 1px solid #f0e4b5;
+    border-radius: 10px;
+    padding: 10px 12px;
+    font-family: 'Lexend', sans-serif;
+    font-size: 12px;
+    color: var(--playlab-dark);
+    margin-top: 6px;
+  }
+  .pl-stat-card strong { color: #7a5a00; }
+
+  /* ==== Interactive Rubric Card (step 8) ==== */
+  .pl-rubric-view {
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 4px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+    margin: 4px 0;
+  }
+  .pl-rubric-view-head {
+    padding: 10px 14px 8px;
+    font-family: 'Lexend', sans-serif;
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--playlab-dark);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .pl-rubric-view-hint {
+    font-size: 10.5px;
+    color: var(--playlab-gray);
+    font-weight: 400;
+  }
+  .pl-rubric-row {
+    display: flex;
+    align-items: center;
+    padding: 10px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 150ms;
+    font-family: 'Lexend', sans-serif;
+    border-left: 3px solid transparent;
+    gap: 10px;
+  }
+  .pl-rubric-row:hover {
+    background: #f4f7f8;
+  }
+  .pl-rubric-row-name {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--playlab-dark);
+    flex: 1;
+  }
+  .pl-rubric-row-level {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    padding: 3px 9px;
+    border-radius: 999px;
+  }
+  .pl-rubric-row-level.meets { background: #d1fae5; color: #047857; }
+  .pl-rubric-row-level.developing { background: #fff6d9; color: #8a6d00; }
+  .pl-rubric-row-level.exceeds { background: #e0f2fe; color: #0369a1; }
+  .pl-rubric-row-count {
+    font-size: 10.5px;
+    color: var(--playlab-gray);
+    min-width: 52px;
+    text-align: right;
+  }
+
+  /* Active state per criterion — matches the highlight color */
+  .pl-rubric-row[data-criterion="argument"].active      { background: #fff6d9; border-left-color: #FFC600; }
+  .pl-rubric-row[data-criterion="evidence"].active      { background: #e0f2fe; border-left-color: #0EA5E9; }
+  .pl-rubric-row[data-criterion="organization"].active  { background: #d1fae5; border-left-color: #10B981; }
+  .pl-rubric-row[data-criterion="voice"].active         { background: #fce7f3; border-left-color: #EC4899; }
+
+  /* Dim non-active rows when something is selected */
+  body[data-active-criterion] .pl-rubric-row:not(.active) { opacity: 0.45; }
+
+  /* Doc highlights triggered by rubric selection (step 8) */
+  body[data-active-criterion="argument"] .hl-thesis,
+  body[data-active-criterion="argument"] .hl-argument {
+    background: #fff6d9;
+    box-shadow: 0 0 0 1px #FFC600 inset;
+    border-radius: 2px; padding: 1px 2px; margin: -1px -2px;
+  }
+  body[data-active-criterion="evidence"] .hl-evidence {
+    background: #e0f2fe;
+    box-shadow: 0 0 0 1px #0EA5E9 inset;
+    border-radius: 2px; padding: 1px 2px; margin: -1px -2px;
+  }
+  body[data-active-criterion="organization"] .hl-organization {
+    background: #ecfdf5;
+    box-shadow: 0 0 0 2px #10B981 inset;
+    border-radius: 4px;
+    padding: 6px 10px;
+    margin: -6px -10px 6px;
+  }
+  body[data-active-criterion="organization"] .hl-organization-weak {
+    background: #fee2e2;
+    box-shadow: 0 0 0 1px #DC2626 inset;
+    border-radius: 2px; padding: 1px 2px; margin: -1px -2px;
+  }
+  body[data-active-criterion="voice"] .hl-voice {
+    background: #fce7f3;
+    box-shadow: 0 0 0 1px #EC4899 inset;
+    border-radius: 2px; padding: 1px 2px; margin: -1px -2px;
+    font-weight: 500;
+  }
+
+  /* Evidence quality badges — small pill that appears next to the highlight */
+  .ev-badge {
+    display: none;
+    font-family: 'Lexend', sans-serif;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    padding: 1px 6px;
+    border-radius: 999px;
+    margin-left: 4px;
+    vertical-align: 1px;
+  }
+  body[data-active-criterion="argument"]     .ev-badge[data-for="argument"],
+  body[data-active-criterion="evidence"]     .ev-badge[data-for="evidence"],
+  body[data-active-criterion="organization"] .ev-badge[data-for="organization"],
+  body[data-active-criterion="voice"]        .ev-badge[data-for="voice"] { display: inline-block; }
+  .ev-badge.strong { background: #d1fae5; color: #047857; }
+  .ev-badge.weak   { background: #fee2e2; color: #b91c1c; }
+  .ev-badge.primary { background: #fff6d9; color: #7a5a00; }
+  .ev-badge.secondary { background: rgba(0,0,0,0.05); color: var(--playlab-gray); }
+
+  /* Rationale card that appears below rubric after selection */
+  .pl-rationale {
+    display: none;
+    margin-top: 8px;
+    padding: 10px 12px;
+    border-radius: 8px;
+    background: #f4f7f8;
+    border-left: 3px solid #cbd5e1;
+    font-family: 'Lexend', sans-serif;
+    font-size: 12px;
+    line-height: 1.55;
+    color: var(--playlab-dark);
+  }
+  body[data-active-criterion="argument"] .pl-rationale-argument,
+  body[data-active-criterion="evidence"] .pl-rationale-evidence,
+  body[data-active-criterion="organization"] .pl-rationale-organization,
+  body[data-active-criterion="voice"] .pl-rationale-voice { display: block; }
+
+  body[data-active-criterion="argument"] .pl-rationale-argument { border-left-color: #FFC600; }
+  body[data-active-criterion="evidence"] .pl-rationale-evidence { border-left-color: #0EA5E9; }
+  body[data-active-criterion="organization"] .pl-rationale-organization { border-left-color: #10B981; }
+  body[data-active-criterion="voice"] .pl-rationale-voice { border-left-color: #EC4899; }
+
+  /* Quick replies */
+  .pl-quickreplies {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-top: 4px;
+    margin-left: 38px;
+  }
+  .pl-quickreply {
+    text-align: left;
+    background: white;
+    border: 1px solid #cde8f5;
+    color: var(--playlab-sky);
+    font-family: 'Lexend', sans-serif;
+    font-size: 12.5px;
+    font-weight: 500;
+    padding: 8px 12px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 150ms;
+  }
+  .pl-quickreply:hover {
+    background: #f0f9ff;
+    border-color: var(--playlab-sky);
+  }
+  .pl-quickreply::before {
+    content: "→  ";
+    opacity: 0.6;
+  }
+
+  /* Input */
+  .pl-input-wrap {
+    padding: 10px 14px 12px;
+    border-top: 1px solid #e8eef0;
+    background: white;
+  }
+  .pl-input {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #f4f7f8;
+    border: 1px solid transparent;
+    border-radius: 999px;
+    padding: 6px 6px 6px 16px;
+  }
+  .pl-input:focus-within {
+    background: white;
+    border-color: var(--playlab-sky);
+  }
+  .pl-input input {
+    flex: 1;
+    border: none;
+    outline: none;
+    background: transparent;
+    font-family: 'Lexend', sans-serif;
+    font-size: 13.5px;
+    color: var(--playlab-dark);
+  }
+  .pl-input input::placeholder { color: #94a3b8; }
+  .pl-send {
+    width: 34px; height: 34px;
+    border-radius: 50%;
+    background: var(--playlab-yellow);
+    border: none;
+    color: var(--playlab-dark);
+    font-size: 15px;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700;
+  }
+
+  .pl-footer-note {
+    text-align: center;
+    font-size: 10.5px;
+    color: var(--playlab-gray);
+    margin-top: 8px;
+    font-family: 'Lexend', sans-serif;
+  }
+  .pl-footer-note a { color: var(--playlab-sky); text-decoration: none; }
+
+  /* ============================================================
+     STEP 12 — INTERACTIVE RUBRIC AT TOP
+     ============================================================ */
+  .pl-rubric-top {
+    display: none;
+    width: 1080px;
+    max-width: calc(100% - 32px);
+    margin: 0 auto 16px;
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    box-shadow: 0 4px 16px rgba(18,33,52,0.08);
+    overflow: hidden;
+    font-family: 'Lexend', sans-serif;
+    position: sticky;
+    top: 8px;
+    z-index: 20;
+  }
+  body[data-step="12"] .pl-rubric-top { display: block; }
+
+  .pl-rubric-top-head {
+    padding: 12px 18px 10px;
+    border-bottom: 1px solid #eef2f6;
+    background: linear-gradient(180deg, #f8fafc 0%, white 100%);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+  }
+  .pl-rubric-top-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--playlab-dark);
+  }
+  .pl-rubric-top-sub {
+    font-size: 11px;
+    color: var(--playlab-gray);
+    margin-top: 2px;
+  }
+  .pl-rubric-top-overall {
+    font-size: 11px;
+    color: var(--playlab-gray);
+    background: #f1f5f9;
+    padding: 6px 12px;
+    border-radius: 999px;
+    font-weight: 500;
+  }
+  .pl-rubric-top-overall strong { color: var(--playlab-dark); }
+
+  /* Criterion tabs */
+  .pl-rubric-tabs {
+    display: flex;
+    gap: 2px;
+    padding: 10px 14px 0;
+    background: #fafbfc;
+    border-bottom: 1px solid #eef2f6;
+  }
+  .pl-rubric-tab {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+    padding: 10px 14px;
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid transparent;
+    border-radius: 8px 8px 0 0;
+    cursor: pointer;
+    font-family: 'Lexend', sans-serif;
+    font-size: 12.5px;
+    color: var(--playlab-gray);
+    transition: all 140ms;
+    text-align: left;
+  }
+  .pl-rubric-tab:hover {
+    background: #f4f7f8;
+    color: var(--playlab-dark);
+  }
+  .pl-rubric-tab.active {
+    background: white;
+    color: var(--playlab-dark);
+    border-bottom-color: var(--playlab-sky);
+  }
+  .pl-rubric-tab .tab-name {
+    font-weight: 600;
+  }
+  .pl-rubric-tab .tab-level {
+    font-size: 9.5px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    padding: 2px 7px;
+    border-radius: 999px;
+    background: #e2e8f0;
+    color: var(--playlab-gray);
+  }
+  .pl-rubric-tab .tab-level.meets    { background: #d1fae5; color: #047857; }
+  .pl-rubric-tab .tab-level.develop  { background: #fff6d9; color: #8a6d00; }
+  .pl-rubric-tab .tab-level.exceed   { background: #e0f2fe; color: #0369a1; }
+
+  /* Panel (one criterion's three-level row) */
+  .pl-rubric-panel { display: none; padding: 14px 18px 4px; }
+  .pl-rubric-top[data-view-crit="argument"]     .pl-rubric-panel[data-crit="argument"],
+  .pl-rubric-top[data-view-crit="evidence"]     .pl-rubric-panel[data-crit="evidence"],
+  .pl-rubric-top[data-view-crit="organization"] .pl-rubric-panel[data-crit="organization"],
+  .pl-rubric-top[data-view-crit="voice"]        .pl-rubric-panel[data-crit="voice"] { display: block; }
+
+  .pl-rubric-panel-intro {
+    font-family: 'Lexend', sans-serif;
+    font-size: 12px;
+    color: var(--playlab-dark);
+    line-height: 1.5;
+    padding: 10px 14px;
+    background: #f8fafc;
+    border-radius: 8px;
+    margin-bottom: 12px;
+  }
+  .pl-rubric-panel-intro strong { font-weight: 600; }
+  .std-ref {
+    font-size: 10px;
+    color: var(--playlab-gray);
+    background: white;
+    padding: 2px 7px;
+    border-radius: 999px;
+    margin-left: 6px;
+    border: 1px solid #e2e8f0;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+  }
+
+  .pl-rubric-levels {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 8px;
+  }
+  .pl-rubric-cell {
+    padding: 12px 14px;
+    border: 1.5px solid #eef2f6;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 180ms;
+    background: white;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    font-family: 'Lexend', sans-serif;
+    min-height: 150px;
+  }
+  .pl-rubric-cell:hover {
+    border-color: #cbd5e1;
+    background: #fafbfc;
+  }
+  .pl-cell-head {
+    font-size: 11.5px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--playlab-gray);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .pl-cell-head .ai-tag {
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    padding: 2px 7px;
+    border-radius: 999px;
+    background: #fff6d9;
+    color: #7a5a00;
+    text-transform: uppercase;
+  }
+  .pl-cell-desc {
+    font-size: 12px;
+    line-height: 1.5;
+    color: var(--playlab-dark);
+    flex: 1;
+  }
+  .pl-cell-count {
+    font-size: 11px;
+    color: var(--playlab-gray);
+    padding-top: 6px;
+    border-top: 1px dashed #eef2f6;
+    font-weight: 500;
+  }
+  .pl-rubric-cell.ai-pick .pl-cell-count {
+    color: var(--playlab-dark);
+    font-weight: 600;
+  }
+
+  /* Active state colored by criterion */
+  .pl-rubric-panel[data-crit="argument"] .pl-rubric-cell.active     { border-color: #FFC600; background: #fff6d9; }
+  .pl-rubric-panel[data-crit="argument"] .pl-rubric-cell.active .pl-cell-head { color: #7a5a00; }
+  .pl-rubric-panel[data-crit="evidence"] .pl-rubric-cell.active     { border-color: #0EA5E9; background: #e0f2fe; }
+  .pl-rubric-panel[data-crit="evidence"] .pl-rubric-cell.active .pl-cell-head { color: #0369a1; }
+  .pl-rubric-panel[data-crit="organization"] .pl-rubric-cell.active { border-color: #10B981; background: #d1fae5; }
+  .pl-rubric-panel[data-crit="organization"] .pl-rubric-cell.active .pl-cell-head { color: #047857; }
+  .pl-rubric-panel[data-crit="voice"] .pl-rubric-cell.active        { border-color: #EC4899; background: #fce7f3; }
+  .pl-rubric-panel[data-crit="voice"] .pl-rubric-cell.active .pl-cell-head { color: #be185d; }
+
+  /* Legacy grid CSS (kept as no-op for old structure) */
+  .pl-rubric-grid {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  .pl-rubric-grid th,
+  .pl-rubric-grid td {
+    padding: 14px 16px;
+    text-align: center;
+    border: 1px solid #eef2f6;
+    font-size: 12.5px;
+    vertical-align: middle;
+  }
+  .pl-rubric-grid thead th {
+    background: #f8fafc;
+    color: var(--playlab-gray);
+    font-weight: 700;
+    font-size: 10.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    padding: 8px 16px;
+  }
+  .pl-rubric-grid tbody th {
+    text-align: left;
+    font-weight: 600;
+    color: var(--playlab-dark);
+    background: #fafbfc;
+    width: 170px;
+    font-size: 13px;
+  }
+  .pl-rubric-grid td {
+    cursor: pointer;
+    color: var(--playlab-gray);
+    transition: all 150ms;
+    position: relative;
+    font-size: 12px;
+    min-height: 56px;
+  }
+  .pl-rubric-grid td:hover:not(.empty) {
+    background: #f4f7f8;
+  }
+  .pl-rubric-grid td.ai-pick {
+    color: var(--playlab-dark);
+    font-weight: 600;
+  }
+  .pl-rubric-grid td .cell-count {
+    display: block;
+    font-size: 11.5px;
+    font-weight: 500;
+  }
+  .pl-rubric-grid td.ai-pick::before {
+    content: "✓ AI suggests";
+    display: block;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    color: #7a5a00;
+    background: #fff6d9;
+    padding: 2px 7px;
+    border-radius: 999px;
+    margin: 0 auto 4px;
+    width: fit-content;
+    text-transform: uppercase;
+  }
+  .pl-rubric-grid td.empty {
+    color: #cbd5e1;
+    font-style: italic;
+    cursor: default;
+  }
+  .pl-rubric-grid td.active {
+    font-weight: 700;
+    box-shadow: inset 0 0 0 2.5px currentColor;
+  }
+  .pl-rubric-grid tr[data-criterion="argument"] td.active {
+    background: #FFC600;
+    color: var(--playlab-dark) !important;
+  }
+  .pl-rubric-grid tr[data-criterion="argument"] td.active::before {
+    background: white;
+  }
+  .pl-rubric-grid tr[data-criterion="evidence"] td.active {
+    background: var(--playlab-sky);
+    color: white !important;
+  }
+  .pl-rubric-grid tr[data-criterion="evidence"] td.active::before {
+    background: white;
+    color: #0369a1;
+  }
+  .pl-rubric-grid tr[data-criterion="organization"] td.active {
+    background: var(--playlab-green);
+    color: white !important;
+  }
+  .pl-rubric-grid tr[data-criterion="organization"] td.active::before {
+    background: white;
+    color: #047857;
+  }
+  .pl-rubric-grid tr[data-criterion="voice"] td.active {
+    background: var(--playlab-pink);
+    color: white !important;
+  }
+  .pl-rubric-grid tr[data-criterion="voice"] td.active::before {
+    background: white;
+    color: #be185d;
+  }
+
+  .pl-rubric-top-footer {
+    padding: 10px 18px;
+    border-top: 1px solid #eef2f6;
+    font-size: 12px;
+    color: var(--playlab-dark);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #fafbfc;
+    font-family: 'Lexend', sans-serif;
+  }
+  .pl-rubric-top-footer strong { color: var(--playlab-dark); }
+  .pl-rubric-top-footer-btn {
+    font-family: 'Lexend', sans-serif;
+    font-size: 11.5px;
+    font-weight: 500;
+    padding: 5px 12px;
+    border-radius: 999px;
+    border: 1px solid #e2e8f0;
+    background: white;
+    color: var(--playlab-gray);
+    cursor: pointer;
+  }
+  .pl-rubric-top-footer-btn:hover { background: #f4f7f8; }
+
+  /* Level-mismatch: hide highlights when a level is selected but the passage's level doesn't match */
+  body[data-active-level]:not([data-active-level="meets"]) .hl-thesis,
+  body[data-active-level]:not([data-active-level="meets"]) .hl-argument {
+    background: transparent !important;
+    box-shadow: none !important;
+    padding: 1px 2px !important;
+    margin: -1px -2px !important;
+  }
+  body[data-active-level]:not([data-active-level="developing"]) .hl-evidence {
+    background: transparent !important;
+    box-shadow: none !important;
+    padding: 1px 2px !important;
+    margin: -1px -2px !important;
+  }
+  body[data-active-level]:not([data-active-level="meets"]) .hl-organization {
+    background: transparent !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    margin: 0 0 12px !important;
+  }
+  body[data-active-level]:not([data-active-level="meets"]) .hl-organization-weak {
+    background: transparent !important;
+    box-shadow: none !important;
+    padding: 1px 2px !important;
+    margin: -1px -2px !important;
+  }
+  body[data-active-level]:not([data-active-level="exceeds"]) .hl-voice {
+    background: transparent !important;
+    box-shadow: none !important;
+    padding: 1px 2px !important;
+    margin: -1px -2px !important;
+    font-weight: inherit !important;
+  }
+  body[data-active-level]:not([data-active-level="meets"]) .ev-badge[data-for="argument"],
+  body[data-active-level]:not([data-active-level="developing"]) .ev-badge[data-for="evidence"],
+  body[data-active-level]:not([data-active-level="meets"]) .ev-badge[data-for="organization"],
+  body[data-active-level]:not([data-active-level="exceeds"]) .ev-badge[data-for="voice"] {
+    display: none !important;
+  }
+
+  /* In step 12, hide chat sidebar and show evidence capture panel */
+  body[data-step="12"] .pl-sidebar         { display: none; }
+  body[data-step="12"] .pl-evidence-panel  { display: flex; }
+
+  .pl-evidence-panel {
+    width: 400px;
+    flex-shrink: 0;
+    background: #fafbfc;
+    border-left: 1px solid var(--gdocs-border);
+    display: none;
+    flex-direction: column;
+    font-family: 'Lexend', sans-serif;
+  }
+  .pl-ev-head {
+    padding: 12px 18px;
+    border-bottom: 1px solid #e8eef0;
+    background: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .pl-ev-brand {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    font-weight: 600;
+    color: var(--playlab-dark);
+    font-size: 14px;
+  }
+  .pl-ev-step {
+    font-size: 10px;
+    color: var(--playlab-sky);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-weight: 700;
+    background: #e0f2fe;
+    padding: 3px 8px;
+    border-radius: 999px;
+  }
+  .pl-ev-context {
+    padding: 14px 18px;
+    border-bottom: 1px solid #e8eef0;
+    background: white;
+  }
+  .pl-ev-empty {
+    text-align: center;
+    padding: 14px 4px;
+    color: var(--playlab-gray);
+  }
+  .pl-ev-empty-icon { font-size: 30px; margin-bottom: 10px; }
+  .pl-ev-empty-title {
+    font-weight: 600;
+    color: var(--playlab-dark);
+    font-size: 13.5px;
+    margin-bottom: 6px;
+  }
+  .pl-ev-empty-sub { font-size: 12px; line-height: 1.55; }
+  .pl-ev-current-criterion {
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--playlab-gray);
+    margin-bottom: 6px;
+  }
+  .pl-ev-current-level {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--playlab-dark);
+    margin-bottom: 8px;
+  }
+  .pl-ev-current-level-badge {
+    font-size: 10px;
+    padding: 3px 10px;
+    border-radius: 999px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-weight: 700;
+  }
+  .pl-ev-current-level-badge.meets      { background: #d1fae5; color: #047857; }
+  .pl-ev-current-level-badge.developing { background: #fff6d9; color: #8a6d00; }
+  .pl-ev-current-level-badge.exceeds    { background: #e0f2fe; color: #0369a1; }
+  .pl-ev-current-desc {
+    font-size: 12px;
+    color: var(--playlab-gray);
+    line-height: 1.5;
+    background: #fafbfc;
+    padding: 10px 12px;
+    border-radius: 6px;
+    border-left: 2px solid #cbd5e1;
+  }
+  .pl-ev-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 12px 14px 12px;
+  }
+  .pl-ev-body-title {
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--playlab-gray);
+    margin: 4px 4px 10px;
+  }
+  .pl-ev-card {
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 12px 14px;
+    margin-bottom: 10px;
+    font-family: 'Lexend', sans-serif;
+    animation: fadeIn 200ms ease;
+  }
+  .pl-ev-card-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 6px;
+    gap: 6px;
+  }
+  .pl-ev-card-location {
+    font-size: 10px;
+    color: var(--playlab-gray);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-weight: 600;
+  }
+  .pl-ev-card-badge {
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    padding: 2px 7px;
+    border-radius: 999px;
+  }
+  .pl-ev-card-badge.weak      { background: #fee2e2; color: #b91c1c; }
+  .pl-ev-card-badge.strong    { background: #d1fae5; color: #047857; }
+  .pl-ev-card-badge.primary   { background: #fff6d9; color: #7a5a00; }
+  .pl-ev-card-badge.secondary { background: rgba(0,0,0,0.06); color: var(--playlab-gray); }
+  .pl-ev-card-quote {
+    font-family: 'Arial', sans-serif;
+    font-size: 12.5px;
+    color: var(--playlab-dark);
+    line-height: 1.5;
+    padding: 8px 10px;
+    background: #fafbfc;
+    border-left: 2px solid #cbd5e1;
+    border-radius: 4px;
+    margin-bottom: 10px;
+    font-style: italic;
+  }
+  .pl-ev-card-comment {
+    width: 100%;
+    min-height: 56px;
+    padding: 8px 10px;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    font-family: 'Lexend', sans-serif;
+    font-size: 12px;
+    color: var(--playlab-dark);
+    resize: vertical;
+    outline: none;
+    background: #fafbfc;
+    line-height: 1.5;
+    box-sizing: border-box;
+  }
+  .pl-ev-card-comment:focus {
+    border-color: var(--playlab-sky);
+    background: white;
+  }
+  .pl-ev-card-comment::placeholder {
+    color: #94a3b8;
+    font-style: italic;
+  }
+  .pl-ev-card-actions {
+    display: flex;
+    justify-content: space-between;
+    gap: 4px;
+    margin-top: 8px;
+  }
+  .pl-ev-card-btn {
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--playlab-sky);
+    background: transparent;
+    border: none;
+    padding: 4px 8px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-family: 'Lexend', sans-serif;
+  }
+  .pl-ev-card-btn:hover { background: #f0f9ff; }
+  .pl-ev-card-btn.remove { color: var(--playlab-gray); }
+  .pl-ev-card-btn.remove:hover { background: #fee2e2; color: #b91c1c; }
+  .pl-ev-add {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1.5px dashed #cbd5e1;
+    background: transparent;
+    border-radius: 8px;
+    color: var(--playlab-gray);
+    font-family: 'Lexend', sans-serif;
+    font-size: 11.5px;
+    font-weight: 500;
+    cursor: pointer;
+    text-align: center;
+    margin-top: 4px;
+  }
+  .pl-ev-add:hover {
+    border-color: var(--playlab-sky);
+    color: var(--playlab-sky);
+    background: #f0f9ff;
+  }
+  .pl-ev-footer {
+    padding: 10px 14px;
+    border-top: 1px solid #e8eef0;
+    background: white;
+  }
+  .pl-ev-final {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+  }
+  #evFinalText {
+    font-size: 12px;
+    color: var(--playlab-dark);
+    font-weight: 500;
+  }
+  .pl-ev-confirm {
+    padding: 7px 16px;
+    border-radius: 999px;
+    background: var(--playlab-sky);
+    color: white;
+    border: none;
+    font-family: 'Lexend', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .pl-ev-confirm:hover { background: #0284c7; }
+
+  /* ============================================================
+     STEP 9 — DYNAMIC INTERFACE (Playlab morphs onto the doc)
+     ============================================================ */
+  .pl-inline-panel {
+    display: none;
+    position: relative;
+    margin: -4px 0 20px;
+    padding: 16px 18px 14px;
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-top: 3px solid var(--playlab-yellow);
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(18,33,52,0.08), 0 2px 4px rgba(18,33,52,0.04);
+    font-family: 'Lexend', sans-serif;
+    font-size: 13px;
+    line-height: 1.5;
+    color: var(--playlab-dark);
+    animation: popIn 350ms ease;
+  }
+  @keyframes popIn {
+    from { opacity: 0; transform: translateY(-6px) scale(0.98); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
+  }
+  body[data-step="9"] .pl-inline-panel { display: block; }
+  .pl-inline-panel::before {
+    content: "";
+    position: absolute;
+    top: -8px; left: 40px;
+    width: 14px; height: 14px;
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-right: none; border-bottom: none;
+    transform: rotate(45deg);
+  }
+  .pl-inline-head {
+    display: flex; align-items: center; gap: 10px;
+    margin-bottom: 12px;
+  }
+  .pl-inline-logo {
+    width: 26px; height: 26px;
+    border-radius: 7px;
+    background: var(--playlab-yellow);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px;
+  }
+  .pl-inline-title {
+    font-weight: 600;
+    font-size: 13.5px;
+  }
+  .pl-inline-mode {
+    font-size: 10.5px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    background: var(--playlab-yellow-soft);
+    color: #7a5a00;
+    padding: 3px 8px;
+    border-radius: 999px;
+  }
+  .pl-inline-close {
+    margin-left: auto;
+    font-size: 11.5px;
+    color: var(--playlab-sky);
+    background: white;
+    border: 1px solid #e2e8f0;
+    padding: 4px 10px;
+    border-radius: 999px;
+    cursor: pointer;
+    font-family: 'Lexend', sans-serif;
+  }
+  .pl-anatomy {
+    display: grid;
+    grid-template-columns: 90px 1fr;
+    gap: 10px 14px;
+    background: #fafbfc;
+    padding: 12px 14px;
+    border-radius: 8px;
+    border: 1px solid #eef2f6;
+    margin: 8px 0;
+  }
+  .pl-anatomy-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--playlab-gray);
+    padding-top: 2px;
+  }
+  .pl-anatomy-label.who   { color: #a07a00; }
+  .pl-anatomy-label.what  { color: #0369a1; }
+  .pl-anatomy-label.why   { color: #047857; }
+  .pl-anatomy-phrase {
+    font-family: 'Arial', sans-serif;
+    font-size: 12.5px;
+    color: var(--playlab-dark);
+    font-style: italic;
+  }
+  .pl-anatomy-phrase .marker {
+    padding: 1px 5px;
+    border-radius: 3px;
+    font-style: normal;
+    font-weight: 500;
+  }
+  .pl-anatomy-phrase.who .marker  { background: #fff6d9; color: #7a5a00; }
+  .pl-anatomy-phrase.what .marker { background: #e0f2fe; color: #0369a1; }
+  .pl-anatomy-phrase.why .marker  { background: #d1fae5; color: #047857; }
+  .pl-inline-note {
+    margin: 8px 0 0;
+    font-size: 11.5px;
+    color: var(--playlab-gray);
+  }
+  /* Sidebar "minimized" message in step 9 */
+  body[data-step="9"] .pl-chat > .pl-msg:not(.step-9),
+  body[data-step="9"] .pl-chat > .pl-quickreplies:not(.step-9) { opacity: 0.35; }
+
+  /* Inline thesis underlines when step 9 active */
+  body[data-step="9"] .thesis-revised::before {
+    content: "";
+    position: absolute;
+    pointer-events: none;
+  }
+
+  /* ============================================================
+     STEP 10 — CROSS-APP CONTEXT FLOW (system view overlay)
+     ============================================================ */
+  .pl-crossapp {
+    display: none;
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(18,33,52,0.98) 0%, rgba(15,28,45,0.98) 100%);
+    color: white;
+    z-index: 50;
+    padding: 40px 32px;
+    overflow-y: auto;
+    font-family: 'Lexend', sans-serif;
+    animation: fadeOver 450ms ease;
+  }
+  @keyframes fadeOver {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
+  body[data-step="10"] .pl-crossapp { display: block; }
+  .pl-crossapp-header {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: 28px;
+  }
+  .pl-crossapp-eyebrow {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--playlab-yellow);
+  }
+  .pl-crossapp-title {
+    font-size: 28px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+  .pl-crossapp-sub {
+    font-size: 14px;
+    color: rgba(255,255,255,0.6);
+  }
+  .pl-flow {
+    display: grid;
+    grid-template-columns: 1fr 24px 1fr 24px 1fr 24px 1fr;
+    gap: 0;
+    align-items: stretch;
+    margin-bottom: 28px;
+  }
+  .pl-flow-card {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 14px;
+    padding: 16px 16px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .pl-flow-card[data-surface="student"] { border-top: 3px solid var(--playlab-yellow); }
+  .pl-flow-card[data-surface="teacher"] { border-top: 3px solid var(--playlab-sky); }
+  .pl-flow-card[data-surface="admin"]   { border-top: 3px solid var(--playlab-pink); }
+  .pl-flow-head {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .pl-flow-icon {
+    width: 34px; height: 34px;
+    border-radius: 9px;
+    background: rgba(255,255,255,0.08);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+  }
+  .pl-flow-title {
+    font-size: 14px;
+    font-weight: 600;
+  }
+  .pl-flow-who {
+    font-size: 11.5px;
+    color: rgba(255,255,255,0.55);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-weight: 500;
+  }
+  .pl-flow-data {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .pl-flow-data li {
+    font-size: 12px;
+    line-height: 1.45;
+    color: rgba(255,255,255,0.82);
+    padding-left: 14px;
+    position: relative;
+  }
+  .pl-flow-data li::before {
+    content: "·";
+    position: absolute;
+    left: 4px;
+    color: var(--playlab-yellow);
+    font-weight: 700;
+  }
+  .pl-flow-arrow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--playlab-yellow);
+    font-size: 22px;
+    font-weight: 700;
+    position: relative;
+  }
+  .pl-flow-arrow::before {
+    content: "";
+    position: absolute;
+    top: 50%; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--playlab-yellow), transparent);
+    opacity: 0.4;
+  }
+  .pl-crossapp-principle {
+    background: rgba(255,255,255,0.05);
+    border-left: 3px solid var(--playlab-yellow);
+    padding: 14px 18px;
+    border-radius: 8px;
+    display: flex;
+    gap: 24px;
+    align-items: center;
+    font-size: 13.5px;
+    color: rgba(255,255,255,0.9);
+  }
+  .pl-crossapp-principle strong { color: white; }
+  .pl-crossapp-stat {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+  }
+  .pl-crossapp-stat-num {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--playlab-yellow);
+    line-height: 1;
+  }
+  .pl-crossapp-stat-label {
+    font-size: 10.5px;
+    color: rgba(255,255,255,0.55);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  /* ============================================================
+     STEP 11 — TEACHING MIRROR (Playlab calibrated to this teacher)
+     ============================================================ */
+  .pl-mirror-banner {
+    display: none;
+    margin: 4px 0 12px;
+    padding: 10px 14px;
+    background: linear-gradient(135deg, #0EA5E9 0%, #0369A1 100%);
+    color: white;
+    border-radius: 10px;
+    font-family: 'Lexend', sans-serif;
+    font-size: 12.5px;
+    font-weight: 500;
+    align-items: center;
+    gap: 10px;
+  }
+  body[data-step="11"] .pl-mirror-banner { display: flex; }
+  .pl-mirror-banner-icon {
+    font-size: 18px;
+  }
+  .pl-mirror-banner-stat {
+    margin-left: auto;
+    font-size: 11px;
+    background: rgba(255,255,255,0.18);
+    padding: 3px 9px;
+    border-radius: 999px;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+  }
+  .pl-mirror-why {
+    background: #f0f9ff;
+    border: 1px solid #bae6fd;
+    border-left: 3px solid var(--playlab-sky);
+    padding: 12px 14px;
+    border-radius: 10px;
+    margin: 8px 0;
+    font-family: 'Lexend', sans-serif;
+    font-size: 12.5px;
+    line-height: 1.55;
+    color: var(--playlab-dark);
+  }
+  .pl-mirror-why-title {
+    font-weight: 600;
+    color: #0369a1;
+    font-size: 11.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 6px;
+  }
+  .pl-mirror-why ul {
+    margin: 4px 0 10px;
+    padding-left: 18px;
+  }
+  .pl-mirror-why li { margin-bottom: 3px; }
+  .pl-mirror-why strong { color: #0369a1; }
+  .pl-mirror-actions {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-top: 8px;
+  }
+  .pl-mirror-btn {
+    font-family: 'Lexend', sans-serif;
+    font-size: 11.5px;
+    font-weight: 500;
+    padding: 6px 12px;
+    border-radius: 8px;
+    border: 1px solid var(--playlab-sky);
+    background: var(--playlab-sky);
+    color: white;
+    cursor: pointer;
+  }
+  .pl-mirror-btn.secondary {
+    background: white;
+    color: var(--playlab-sky);
+  }
+  .pl-mirror-vs {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 8px;
+    margin: 10px 0;
+  }
+  .pl-mirror-v {
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 10px 12px;
+  }
+  .pl-mirror-v.v1 {
+    border-left: 3px solid #cbd5e1;
+  }
+  .pl-mirror-v.v2 {
+    border-left: 3px solid var(--playlab-sky);
+    background: #f0f9ff;
+  }
+  .pl-mirror-v-label {
+    font-family: 'Lexend', sans-serif;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--playlab-gray);
+    margin-bottom: 4px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .pl-mirror-v.v2 .pl-mirror-v-label { color: #0369a1; }
+  .pl-mirror-v-label .pill {
+    background: rgba(0,0,0,0.06);
+    padding: 1px 6px;
+    border-radius: 999px;
+    font-weight: 600;
+  }
+  .pl-mirror-v.v2 .pl-mirror-v-label .pill {
+    background: var(--playlab-sky);
+    color: white;
+  }
+  .pl-mirror-v-text {
+    font-family: 'Arial', sans-serif;
+    font-size: 12.5px;
+    color: var(--playlab-dark);
+    line-height: 1.5;
+  }
+  .pl-mirror-confidence {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 6px;
+    font-family: 'Lexend', sans-serif;
+    font-size: 11px;
+    color: var(--playlab-gray);
+  }
+  .pl-mirror-bar {
+    flex: 1;
+    height: 5px;
+    background: #e2e8f0;
+    border-radius: 99px;
+    overflow: hidden;
+  }
+  .pl-mirror-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--playlab-sky), var(--playlab-green));
+    border-radius: 99px;
+  }
+
+  /* ============ DEMO MENU (expandable list of all views) ============ */
+  .demo-menu-scrim {
+    position: fixed;
+    inset: 0;
+    background: rgba(18,33,52,0.4);
+    z-index: 99;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 180ms ease;
+  }
+  .demo-menu-scrim.open {
+    opacity: 1;
+    pointer-events: auto;
+  }
+  .demo-menu {
+    position: fixed;
+    bottom: 80px;
+    left: 50%;
+    transform: translateX(-50%) translateY(12px);
+    background: var(--playlab-dark);
+    color: white;
+    border-radius: 16px;
+    padding: 8px;
+    width: min(840px, calc(100% - 32px));
+    max-height: calc(100vh - 140px);
+    overflow-y: auto;
+    box-shadow: 0 20px 48px rgba(0,0,0,0.35);
+    z-index: 101;
+    font-family: 'Lexend', sans-serif;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 200ms ease, transform 200ms ease;
+  }
+  .demo-menu.open {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateX(-50%) translateY(0);
+  }
+  .demo-menu-inner {
+    background: rgba(255,255,255,0.02);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 12px;
+    padding: 14px 16px 10px;
+  }
+  .demo-menu-cols {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+  .demo-menu-col {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .demo-menu-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 6px 10px 10px;
+    font-size: 13px;
+    font-weight: 600;
+    color: rgba(255,255,255,0.85);
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    margin-bottom: 6px;
+  }
+  .demo-menu-header .demo-menu-icon {
+    width: 24px; height: 24px;
+    background: rgba(255,255,255,0.08);
+    border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px;
+  }
+  .demo-menu-header.student .demo-menu-icon { background: rgba(255,198,0,0.18); }
+  .demo-menu-header.teacher .demo-menu-icon { background: rgba(14,165,233,0.22); }
+
+  .demo-menu-tier {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 10px 6px;
+    margin-top: 4px;
+  }
+  .demo-menu-tier-badge {
+    font-size: 9.5px;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    padding: 2px 7px;
+    border-radius: 999px;
+    color: var(--playlab-dark);
+  }
+  .demo-menu-tier-badge.s { background: var(--playlab-yellow); }
+  .demo-menu-tier-badge.a { background: #bae6fd; color: #0c4a6e; }
+  .demo-menu-tier-badge.b { background: rgba(255,255,255,0.12); color: rgba(255,255,255,0.65); }
+  .demo-menu-tier-label {
+    font-size: 10.5px;
+    color: rgba(255,255,255,0.5);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-weight: 600;
+  }
+
+  .demo-menu-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    padding: 8px 10px;
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: 8px;
+    color: rgba(255,255,255,0.85);
+    font-family: 'Lexend', sans-serif;
+    font-size: 12.5px;
+    text-align: left;
+    cursor: pointer;
+    transition: all 140ms;
+  }
+  .demo-menu-item:hover {
+    background: rgba(255,255,255,0.06);
+    color: white;
+  }
+  .demo-menu-item.active {
+    background: rgba(255,198,0,0.14);
+    border-color: rgba(255,198,0,0.4);
+    color: white;
+  }
+  .demo-menu-item .dm-num {
+    flex-shrink: 0;
+    width: 26px; height: 26px;
+    border-radius: 7px;
+    background: rgba(255,255,255,0.08);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11.5px;
+    font-weight: 700;
+    color: rgba(255,255,255,0.7);
+  }
+  .demo-menu-item.active .dm-num {
+    background: var(--playlab-yellow);
+    color: var(--playlab-dark);
+  }
+  .demo-menu-item .dm-title {
+    flex: 1;
+    line-height: 1.4;
+  }
+
+  .demo-menu-footer {
+    margin-top: 14px;
+    padding: 10px 12px;
+    background: rgba(255,198,0,0.08);
+    border: 1px solid rgba(255,198,0,0.2);
+    border-radius: 10px;
+    font-size: 11.5px;
+    color: rgba(255,255,255,0.8);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .demo-menu-path {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+    color: rgba(255,255,255,0.55);
+  }
+  .demo-menu-pill {
+    background: var(--playlab-yellow);
+    color: var(--playlab-dark);
+    font-family: 'Lexend', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    border: none;
+    padding: 3px 9px;
+    border-radius: 999px;
+    cursor: pointer;
+  }
+  .demo-menu-pill:hover { background: #ffd537; }
+
+  /* Clickable label pill inside demo-nav */
+  .demo-nav-label-btn {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.1);
+    color: white;
+    font-family: 'Lexend', sans-serif;
+    font-size: 13px;
+    padding: 8px 14px;
+    border-radius: 999px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    min-width: 260px;
+    text-align: left;
+  }
+  .demo-nav-label-btn:hover { background: rgba(255,255,255,0.12); }
+  .demo-chevron {
+    color: rgba(255,255,255,0.5);
+    font-size: 10px;
+    transition: transform 160ms ease;
+  }
+  body.demo-menu-open .demo-chevron { transform: rotate(180deg); color: var(--playlab-yellow); }
+
+  /* ============ DEMO NAV ============ */
+  .demo-nav {
+    position: fixed;
+    bottom: 16px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--playlab-dark);
+    color: white;
+    padding: 8px 8px 8px 16px;
+    border-radius: 999px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: 'Lexend', sans-serif;
+    font-size: 13px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.25);
+    z-index: 100;
+  }
+  .demo-perspective {
+    background: var(--playlab-yellow);
+    color: var(--playlab-dark);
+    padding: 3px 10px;
+    border-radius: 999px;
+    font-size: 10.5px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-right: 4px;
+  }
+  body[data-view="teacher"] .demo-perspective {
+    background: var(--playlab-sky);
+    color: white;
+  }
+  .demo-nav-label {
+    font-weight: 500;
+    min-width: 210px;
+  }
+  .demo-nav-step {
+    color: var(--playlab-yellow);
+    font-weight: 600;
+    margin-right: 8px;
+  }
+  body[data-view="teacher"] .demo-nav-step { color: #7DD3FC; }
+  .demo-btn {
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.2);
+    color: white;
+    font-family: 'Lexend', sans-serif;
+    font-size: 12.5px;
+    font-weight: 500;
+    padding: 7px 14px;
+    border-radius: 999px;
+    cursor: pointer;
+  }
+  .demo-btn:hover { background: rgba(255,255,255,0.2); }
+  .demo-btn.primary {
+    background: var(--playlab-yellow);
+    color: var(--playlab-dark);
+    border-color: var(--playlab-yellow);
+    font-weight: 600;
+  }
+  .demo-btn.primary:hover { background: #ffd537; }
+  .demo-btn:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+  }
+
+  /* Step content visibility */
+  .step-content { display: none; }
+  body[data-step="1"]  .step-1  { display: flex; }
+  body[data-step="2"]  .step-2  { display: flex; }
+  body[data-step="3"]  .step-3  { display: flex; }
+  body[data-step="4"]  .step-4  { display: flex; }
+  body[data-step="5"]  .step-5  { display: flex; }
+  body[data-step="6"]  .step-6  { display: flex; }
+  body[data-step="7"]  .step-7  { display: flex; }
+  body[data-step="8"]  .step-8  { display: flex; }
+  body[data-step="9"]  .step-9  { display: flex; }
+  body[data-step="10"] .step-10 { display: flex; }
+  body[data-step="11"] .step-11 { display: flex; }
+  body[data-step="6"] .step-6-carry,
+  body[data-step="7"] .step-6-carry { display: flex; }
+  body[data-step="7"] .step-7-carry { display: flex; }
+
+  /* Inserted state on step 6 cards */
+  body[data-step="7"] #rubric-card-1 .pl-rubric-insert { }
+
+  /* Scrollbar */
+  .gdocs-canvas::-webkit-scrollbar,
+  .pl-chat::-webkit-scrollbar { width: 10px; }
+  .gdocs-canvas::-webkit-scrollbar-thumb,
+  .pl-chat::-webkit-scrollbar-thumb {
+    background: #cbd5e1; border-radius: 10px;
+  }
+</style>
+</head>
+<body data-step="1" data-view="student">
+
+<div class="app">
+  <!-- ============ HEADER ============ -->
+  <header class="gdocs-header">
+    <div class="gdocs-title-row">
+      <div class="gdocs-logo">D</div>
+      <div class="gdocs-title-block">
+        <div>
+          <span class="gdocs-doc-title" id="docTitle">Climate Essay — Draft 1</span>
+          <span class="gdocs-shared-badge">Owned by Maya Rodriguez · Shared with you</span>
+        </div>
+        <div class="gdocs-menubar">
+          <span>File</span><span>Edit</span><span>View</span><span>Insert</span>
+          <span>Format</span><span>Tools</span><span>Extensions</span><span>Help</span>
+        </div>
+      </div>
+      <div class="gdocs-header-right">
+        <div class="gdocs-icon-btn">💬</div>
+        <button class="gdocs-btn">Share</button>
+        <div class="gdocs-avatar" id="headerAvatar">M</div>
+      </div>
+    </div>
+
+    <div class="gdocs-toolbar">
+      <div class="tb-group">
+        <span class="tb-item">↶</span>
+        <span class="tb-item">↷</span>
+        <span class="tb-item">🖨</span>
+      </div>
+      <div class="tb-group">
+        <span class="tb-item dropdown">100%</span>
+      </div>
+      <div class="tb-group">
+        <span class="tb-item dropdown">Normal text</span>
+        <span class="tb-item dropdown">Arial</span>
+        <span class="tb-item">—</span>
+        <span class="tb-item">11</span>
+        <span class="tb-item">+</span>
+      </div>
+      <div class="tb-group">
+        <span class="tb-item"><b>B</b></span>
+        <span class="tb-item"><i>I</i></span>
+        <span class="tb-item"><u>U</u></span>
+        <span class="tb-item">A</span>
+      </div>
+      <div class="tb-group">
+        <span class="tb-item">≡</span>
+        <span class="tb-item">⋮≡</span>
+        <span class="tb-item">•</span>
+        <span class="tb-item">1.</span>
+      </div>
+      <div class="tb-group" style="margin-left:auto;border-right:none;">
+        <span class="tb-item" style="color: var(--playlab-dark); background: #fff6d9; font-weight:500;">🟡 Playlab</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- ============ BODY ============ -->
+  <div class="gdocs-body" style="position:relative;">
+
+    <!-- STEP 10 · Cross-App Context Flow — full-canvas overlay -->
+    <div class="pl-crossapp">
+      <div class="pl-crossapp-header">
+        <div class="pl-crossapp-eyebrow">Zoom out · System view</div>
+        <div class="pl-crossapp-title">Maya's context flows across four Playlab surfaces</div>
+        <div class="pl-crossapp-sub">Same student · same rubric · same memory across four surfaces.</div>
+      </div>
+
+      <div class="pl-flow">
+        <div class="pl-flow-card" data-surface="student">
+          <div class="pl-flow-head">
+            <div class="pl-flow-icon">✍️</div>
+            <div>
+              <div class="pl-flow-title">Writing Coach</div>
+              <div class="pl-flow-who">Maya · while drafting</div>
+            </div>
+          </div>
+          <ul class="pl-flow-data">
+            <li>7 conversations across 3 days</li>
+            <li>Thesis revised in ¶1 (student wrote it)</li>
+            <li>Framework card → 3 moves identified</li>
+            <li>Refused to write for her (integrity)</li>
+          </ul>
+        </div>
+
+        <div class="pl-flow-arrow">→</div>
+
+        <div class="pl-flow-card" data-surface="student">
+          <div class="pl-flow-head">
+            <div class="pl-flow-icon">📋</div>
+            <div>
+              <div class="pl-flow-title">Rubric Self-Check</div>
+              <div class="pl-flow-who">Maya · before submit</div>
+            </div>
+          </div>
+          <ul class="pl-flow-data">
+            <li>Pre-populated with her Coach conversation</li>
+            <li>Self-scored 3 of 4 criteria accurately</li>
+            <li>Flagged her own weak evidence sentence</li>
+            <li>Submitted with metacognitive note</li>
+          </ul>
+        </div>
+
+        <div class="pl-flow-arrow">→</div>
+
+        <div class="pl-flow-card" data-surface="teacher">
+          <div class="pl-flow-head">
+            <div class="pl-flow-icon">📝</div>
+            <div>
+              <div class="pl-flow-title">Feedback Assistant</div>
+              <div class="pl-flow-who">Ms. Patel · grading</div>
+            </div>
+          </div>
+          <ul class="pl-flow-data">
+            <li>Maya's Self-Check pre-surfaced</li>
+            <li>4 rubric-aligned draft comments ready</li>
+            <li>Evidence levels reference student process</li>
+            <li>~19 min saved per essay</li>
+          </ul>
+        </div>
+
+        <div class="pl-flow-arrow">→</div>
+
+        <div class="pl-flow-card" data-surface="admin">
+          <div class="pl-flow-head">
+            <div class="pl-flow-icon">📊</div>
+            <div>
+              <div class="pl-flow-title">9th Grade ELA Dashboard</div>
+              <div class="pl-flow-who">Dept Lead · end of week</div>
+            </div>
+          </div>
+          <ul class="pl-flow-data">
+            <li>Patterns across 28 essays this week</li>
+            <li>12 students improved thesis via Coach</li>
+            <li>Insight: ¶2 evidence needs scaffolding</li>
+            <li>Curriculum nudge scheduled for Monday</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="pl-crossapp-principle">
+        <div class="pl-crossapp-stat">
+          <div class="pl-crossapp-stat-num">4</div>
+          <div class="pl-crossapp-stat-label">Surfaces</div>
+        </div>
+        <div class="pl-crossapp-stat">
+          <div class="pl-crossapp-stat-num">1</div>
+          <div class="pl-crossapp-stat-label">Rubric</div>
+        </div>
+        <div class="pl-crossapp-stat">
+          <div class="pl-crossapp-stat-num">1</div>
+          <div class="pl-crossapp-stat-label">Memory</div>
+        </div>
+        <div style="flex:1;">
+          The student's thinking shows up wherever it matters. The teacher's judgment rolls up to curriculum decisions.
+        </div>
+      </div>
+    </div>
+
+    <!-- GOOGLE DOC CANVAS -->
+    <main class="gdocs-canvas">
+      <div class="submitted-banner">
+        <span>📤</span>
+        <span><strong>Submitted</strong> by <span class="student-pill">Maya Rodriguez</span> on April 17, 3:42 PM · 9th Grade Argumentative Essay · Period 3</span>
+      </div>
+
+      <!-- STEP 12 · Interactive rubric at top — one criterion at a time -->
+      <div class="pl-rubric-top" data-view-crit="argument">
+        <div class="pl-rubric-top-head">
+          <div>
+            <div class="pl-rubric-top-title">Grade Maya's essay · 9th Grade Argumentative Rubric</div>
+            <div class="pl-rubric-top-sub">Adapted from CCSS W.9-10.1 &amp; SBAC Argumentative Writing Rubric · open source</div>
+          </div>
+          <div class="pl-rubric-top-overall">Composite: <strong>Meets</strong> · 14/16</div>
+        </div>
+
+        <div class="pl-rubric-tabs">
+          <button class="pl-rubric-tab active" data-crit="argument"     onclick="selectRubricRow('argument')">
+            <span class="tab-name">Argument</span><span class="tab-level meets">Meets</span>
+          </button>
+          <button class="pl-rubric-tab"        data-crit="evidence"     onclick="selectRubricRow('evidence')">
+            <span class="tab-name">Evidence</span><span class="tab-level develop">Developing</span>
+          </button>
+          <button class="pl-rubric-tab"        data-crit="organization" onclick="selectRubricRow('organization')">
+            <span class="tab-name">Organization</span><span class="tab-level meets">Meets</span>
+          </button>
+          <button class="pl-rubric-tab"        data-crit="voice"        onclick="selectRubricRow('voice')">
+            <span class="tab-name">Voice &amp; Style</span><span class="tab-level exceed">Exceeds</span>
+          </button>
+        </div>
+
+        <div class="pl-rubric-panels">
+
+          <!-- ARGUMENT -->
+          <div class="pl-rubric-panel" data-crit="argument">
+            <div class="pl-rubric-panel-intro">
+              <strong>Argument</strong> — Introduce and sustain a precise, defensible claim that establishes the significance of the topic. <span class="std-ref">CCSS W.9-10.1.a</span>
+            </div>
+            <div class="pl-rubric-levels">
+              <div class="pl-rubric-cell" data-level="developing" onclick="selectRubricCell('argument','developing',this)">
+                <div class="pl-cell-head">Developing</div>
+                <div class="pl-cell-desc">Claim is general, formulaic, or understated. Lacks a specific stance; the reader cannot easily identify what the writer is asking them to believe.</div>
+                <div class="pl-cell-count">No passages at this level</div>
+              </div>
+              <div class="pl-rubric-cell ai-pick" data-level="meets" onclick="selectRubricCell('argument','meets',this)">
+                <div class="pl-cell-head">Meets <span class="ai-tag">✓ AI suggests</span></div>
+                <div class="pl-cell-desc">Introduces a precise, defensible claim that names a specific actor, stance, and stake. Claim is sustained across the essay; reader can respond to it.</div>
+                <div class="pl-cell-count">2 passages in Maya's draft</div>
+              </div>
+              <div class="pl-rubric-cell" data-level="exceeds" onclick="selectRubricCell('argument','exceeds',this)">
+                <div class="pl-cell-head">Exceeds</div>
+                <div class="pl-cell-desc">Claim is distinctive and nuanced. Acknowledges counterclaims or complicating perspectives. Distinguishes itself from competing positions.</div>
+                <div class="pl-cell-count">No passages at this level</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- EVIDENCE -->
+          <div class="pl-rubric-panel" data-crit="evidence">
+            <div class="pl-rubric-panel-intro">
+              <strong>Evidence</strong> — Supply relevant and sufficient evidence from credible sources, demonstrating an understanding of the topic. <span class="std-ref">CCSS W.9-10.1.b</span>
+            </div>
+            <div class="pl-rubric-levels">
+              <div class="pl-rubric-cell ai-pick" data-level="developing" onclick="selectRubricCell('evidence','developing',this)">
+                <div class="pl-cell-head">Developing <span class="ai-tag">✓ AI suggests</span></div>
+                <div class="pl-cell-desc">Evidence is vague or limited. Relies on personal anecdote without corroboration. Cites no specific facts, data, or credible sources.</div>
+                <div class="pl-cell-count">2 passages in Maya's draft</div>
+              </div>
+              <div class="pl-rubric-cell" data-level="meets" onclick="selectRubricCell('evidence','meets',this)">
+                <div class="pl-cell-head">Meets</div>
+                <div class="pl-cell-desc">Supplies relevant evidence from at least one credible source. Includes specific facts, statistics, or cited information. Evidence supports the claim.</div>
+                <div class="pl-cell-count">No passages at this level</div>
+              </div>
+              <div class="pl-rubric-cell" data-level="exceeds" onclick="selectRubricCell('evidence','exceeds',this)">
+                <div class="pl-cell-head">Exceeds</div>
+                <div class="pl-cell-desc">Integrates varied, relevant evidence from multiple credible sources. Synthesizes data, narrative, and expert perspective. Anticipates counter-evidence.</div>
+                <div class="pl-cell-count">No passages at this level</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ORGANIZATION -->
+          <div class="pl-rubric-panel" data-crit="organization">
+            <div class="pl-rubric-panel-intro">
+              <strong>Organization</strong> — Create cohesion and clarify the relationships among claim, reasons, and evidence. <span class="std-ref">CCSS W.9-10.1.c</span>
+            </div>
+            <div class="pl-rubric-levels">
+              <div class="pl-rubric-cell" data-level="developing" onclick="selectRubricCell('organization','developing',this)">
+                <div class="pl-cell-head">Developing</div>
+                <div class="pl-cell-desc">Paragraphs present information but transitions are weak or missing. Strongest reasoning may be buried. Conclusion restates without synthesizing.</div>
+                <div class="pl-cell-count">No passages at this level</div>
+              </div>
+              <div class="pl-rubric-cell ai-pick" data-level="meets" onclick="selectRubricCell('organization','meets',this)">
+                <div class="pl-cell-head">Meets <span class="ai-tag">✓ AI suggests</span></div>
+                <div class="pl-cell-desc">Logical structure with clear transitions. Reasons build on one another. Conclusion reinforces the claim with a closing insight.</div>
+                <div class="pl-cell-count">2 passages in Maya's draft</div>
+              </div>
+              <div class="pl-rubric-cell" data-level="exceeds" onclick="selectRubricCell('organization','exceeds',this)">
+                <div class="pl-cell-head">Exceeds</div>
+                <div class="pl-cell-desc">Structure deliberately serves the argument — strongest reasoning placed for rhetorical effect. Conclusion leaves a lasting synthesis, not restatement.</div>
+                <div class="pl-cell-count">No passages at this level</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- VOICE & STYLE -->
+          <div class="pl-rubric-panel" data-crit="voice">
+            <div class="pl-rubric-panel-intro">
+              <strong>Voice &amp; Style</strong> — Establish and maintain a formal style and an objective tone appropriate to the discipline. <span class="std-ref">CCSS W.9-10.1.d</span>
+            </div>
+            <div class="pl-rubric-levels">
+              <div class="pl-rubric-cell" data-level="developing" onclick="selectRubricCell('voice','developing',this)">
+                <div class="pl-cell-head">Developing</div>
+                <div class="pl-cell-desc">Tone is inconsistent or informal in ways that undermine the argument. Word choice is generic. Authorial presence is hard to detect.</div>
+                <div class="pl-cell-count">No passages at this level</div>
+              </div>
+              <div class="pl-rubric-cell" data-level="meets" onclick="selectRubricCell('voice','meets',this)">
+                <div class="pl-cell-head">Meets</div>
+                <div class="pl-cell-desc">Maintains a formal style appropriate to argumentation. Word choice is precise. A discernible authorial voice emerges.</div>
+                <div class="pl-cell-count">No passages at this level</div>
+              </div>
+              <div class="pl-rubric-cell ai-pick" data-level="exceeds" onclick="selectRubricCell('voice','exceeds',this)">
+                <div class="pl-cell-head">Exceeds <span class="ai-tag">✓ AI suggests</span></div>
+                <div class="pl-cell-desc">Establishes a distinct, confident authorial voice that enhances the argument. Uses varied syntax and rhetorical devices purposefully.</div>
+                <div class="pl-cell-count">2 passages in Maya's draft</div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="pl-rubric-top-footer">
+          <span id="rubricStatus">Click any level cell to highlight supporting passages below</span>
+          <button class="pl-rubric-top-footer-btn" onclick="clearRubricCell()">Clear selection</button>
+        </div>
+      </div>
+
+      <div class="page-and-margin">
+        <div class="gdocs-page">
+          <h1 class="doc-title">Why My Generation Can't Wait on Climate Change</h1>
+          <div class="doc-byline">Maya Rodriguez · English 9 · Ms. Patel · Riverview USD · April 17</div>
+
+          <p class="doc-p">
+            <span class="hl hl-thesis" title="Revised with Playlab Writing Coach"><span class="thesis-original">Climate change is a big problem and we need to do something about it soon.</span><span class="thesis-revised">My generation is going to have to live with every climate decision adults are making right now, which is why students like me can't afford to keep waiting quietly for them to act.</span></span><span class="ev-badge primary" data-for="argument">Thesis</span>
+            Scientists have been warning us for years, but not enough has changed. The effects are already happening in places all around the world and people my age are starting to notice it more than ever. If we don't take action quickly, the future could look very different from what we are used to.
+          </p>
+
+          <!-- STEP 9 · Dynamic Interface — inline Playlab panel anchored to the thesis -->
+          <div class="pl-inline-panel">
+            <div class="pl-inline-head">
+              <div class="pl-inline-logo">🟡</div>
+              <div class="pl-inline-title">Thesis Anatomy</div>
+              <span class="pl-inline-mode">Inline mode</span>
+              <button class="pl-inline-close">↗ Collapse</button>
+            </div>
+            <div style="font-size:12.5px;color:var(--playlab-dark);margin-bottom:4px;">
+              Your revised thesis does all three moves. Here's how they map — click any row to highlight it above:
+            </div>
+            <div class="pl-anatomy">
+              <div class="pl-anatomy-label who">Who</div>
+              <div class="pl-anatomy-phrase who"><span class="marker">my generation</span> · <span class="marker">students like me</span></div>
+              <div class="pl-anatomy-label what">What</div>
+              <div class="pl-anatomy-phrase what"><span class="marker">can't afford to keep waiting quietly for them to act</span></div>
+              <div class="pl-anatomy-label why">Why&nbsp;now</div>
+              <div class="pl-anatomy-phrase why"><span class="marker">going to have to live with every climate decision adults are making right now</span></div>
+            </div>
+            <div class="pl-inline-note">
+              Chat still available in the sidebar if you need it.
+            </div>
+          </div>
+
+          <p class="doc-p">
+            One reason climate change matters is because it affects our everyday lives. <span class="hl hl-evidence">A lot of places are experiencing weather that is getting worse.</span><span class="ev-badge weak" data-for="evidence">Vague</span> For example, my cousin lives in Phoenix and she told me last summer was the hottest one she can remember, with <span class="hl hl-evidence">over fifty days above 110 degrees</span><span class="ev-badge strong" data-for="evidence">Specific</span>. That kind of heat isn't just uncomfortable — it's dangerous, especially for older people and kids who play outside. These are the kinds of things that used to feel far away but now feel close.
+          </p>
+
+          <p class="doc-p hl-organization">
+            Another reason is that young people are the ones who will have to live with the decisions being made right now. Adults talk about climate change like it's a future problem, but for us it's a right-now problem. I've watched classmates skip school to go to climate marches, and I've seen the way my little brother asks questions about whether the planet will be okay when he grows up. <span class="hl hl-voice">That hit me hard.</span><span class="ev-badge secondary" data-for="voice">Raw</span> <span class="hl hl-voice">We shouldn't have to grow up scared.</span><span class="ev-badge primary" data-for="voice">Hero line</span>
+          </p>
+
+          <p class="doc-p">
+            There are things we can do. Schools could teach more about sustainability, communities could invest in public transit, and governments could pass stronger laws about pollution. I know some of this is already happening but it needs to happen faster. <span class="hl hl-argument">Every year we wait is a year we can't get back.</span><span class="ev-badge secondary" data-for="argument">Supporting</span>
+          </p>
+
+          <p class="doc-p">
+            <span class="hl hl-organization-weak">In conclusion, climate change is something that can't be ignored anymore</span><span class="ev-badge weak" data-for="organization">Incomplete</span><span class="doc-cursor"></span>
+          </p>
+        </div>
+
+        <!-- Right margin: Google Docs-style comments -->
+        <div class="gdocs-margin">
+          <div class="gdocs-comment show-step-7">
+            <div class="gdocs-comment-head">
+              <div class="gdocs-comment-avatar">P</div>
+              <div class="gdocs-comment-name">Ms. Patel</div>
+              <div class="gdocs-comment-time">Just now</div>
+            </div>
+            <div class="gdocs-comment-body">
+              Maya — your revised thesis is so much stronger than where you started. Naming "my generation" gives you a specific stance, and "policies adults have been delaying" shows real point of view. This is the backbone of a strong argumentative essay. 💪
+            </div>
+            <div class="gdocs-comment-footer">
+              <span class="chip">Argument · Meets</span>
+              <span class="playlab-origin">Drafted with Playlab</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- ============ PLAYLAB SIDEBAR ============ -->
+    <aside class="pl-sidebar">
+      <div class="pl-header">
+        <div class="pl-brand">
+          <div class="pl-logo">🟡</div>
+          <span class="pl-wordmark">
+            <span class="p1">P</span><span class="p2">l</span><span class="p3">a</span><span class="p4">y</span><span class="p5">l</span><span class="p6">a</span><span class="p7">b</span>
+          </span>
+        </div>
+        <div class="pl-header-actions">
+          <button class="pl-icon-btn" title="New conversation">✎</button>
+          <button class="pl-icon-btn" title="History">🕒</button>
+          <button class="pl-icon-btn" title="Close">✕</button>
+        </div>
+      </div>
+
+      <!-- STUDENT APP BANNER -->
+      <div class="pl-app-banner pl-app-student">
+        <div class="pl-app-row">
+          <div class="pl-app-icon">✍️</div>
+          <div class="pl-app-meta">
+            <div class="pl-app-name">Writing Coach <span class="pl-verified" title="Reviewed against Playlab App Rubric">✓ District app</span></div>
+            <div class="pl-app-author">By Riverview USD · 9th Grade ELA Team</div>
+          </div>
+          <button class="pl-app-switch">Switch app</button>
+        </div>
+        <div class="pl-quick-actions">
+          <button class="pl-quick-action">Review my thesis</button>
+          <button class="pl-quick-action">Check my evidence</button>
+          <button class="pl-quick-action">I'm stuck</button>
+        </div>
+      </div>
+
+      <!-- TEACHER APP BANNER -->
+      <div class="pl-app-banner pl-app-teacher">
+        <div class="pl-app-row">
+          <div class="pl-app-icon">📝</div>
+          <div class="pl-app-meta">
+            <div class="pl-app-name">Feedback Assistant <span class="pl-verified" title="Reviewed against Playlab App Rubric">✓ District app</span></div>
+            <div class="pl-app-author">By Riverview USD · ELA Curriculum Team</div>
+          </div>
+          <button class="pl-app-switch">Switch app</button>
+        </div>
+        <div class="pl-quick-actions">
+          <button class="pl-quick-action pl-stat"><span class="pl-stat-num">28</span> drafts to review</button>
+          <button class="pl-quick-action pl-stat pl-stat-alert"><span class="pl-stat-num">3</span> below rubric</button>
+          <button class="pl-quick-action pl-stat"><span class="pl-stat-num">12</span> used Coach 5+ times</button>
+        </div>
+      </div>
+
+      <div class="pl-chat" id="plChat">
+
+        <!-- ============ STEP 1 ============ -->
+        <div class="pl-msg step-content step-1">
+          <div class="pl-avatar bot">🟡</div>
+          <div class="pl-bubble bot">
+            <p>Hi Maya — I can see you're working on <strong>"Why My Generation Can't Wait on Climate Change."</strong> 👋</p>
+            <p>I've read your full draft against Riverview's 9th Grade Argumentative Rubric — the same rubric Ms. Patel will use to score it. There's a lot of heart here, especially the part about your little brother.</p>
+            <p>Ready to make this essay sharper?</p>
+          </div>
+        </div>
+        <div class="pl-quickreplies step-content step-1">
+          <button class="pl-quickreply" onclick="goStep(2)">Review my thesis</button>
+          <button class="pl-quickreply" onclick="goStep(2)">Check my evidence</button>
+          <button class="pl-quickreply" onclick="goStep(2)">Where could it land harder?</button>
+        </div>
+
+        <!-- ============ STEP 2 ============ -->
+        <div class="pl-msg user step-content step-2">
+          <div class="pl-avatar user">M</div>
+          <div class="pl-bubble user">Review my thesis</div>
+        </div>
+        <div class="pl-msg step-content step-2">
+          <div class="pl-avatar bot">🟡</div>
+          <div class="pl-bubble bot">
+            <div class="pl-context-chip">Thesis · Rubric criterion: Argument</div>
+            <p>I highlighted it in your doc. Here's what I'm noticing:</p>
+            <p>Right now it says <em>"climate change is a big problem and we need to do something."</em> That's true — but almost every essay on this topic says the same thing. <strong>What's the argument only <em>you</em> can make?</strong></p>
+            <p>Three questions to sharpen it:</p>
+            <ul>
+              <li>Who specifically needs to act?</li>
+              <li>Why is your generation's voice different?</li>
+              <li>What makes <em>now</em> the moment?</li>
+            </ul>
+            <p>Here's the thing: your real thesis is already hiding in your draft — especially paragraph 3. Want me to show you what's working in your own writing that belongs up front?</p>
+          </div>
+        </div>
+        <div class="pl-quickreplies step-content step-2">
+          <button class="pl-quickreply" onclick="goStep(3)">Show me what's working in ¶3</button>
+          <button class="pl-quickreply" onclick="goStep(3)">Can you just write one for me?</button>
+          <button class="pl-quickreply" onclick="goStep(3)">What should the structure be?</button>
+        </div>
+
+        <!-- ============ STEP 3 — THE INTEGRITY MOMENT ============ -->
+        <div class="pl-msg user step-content step-3">
+          <div class="pl-avatar user">M</div>
+          <div class="pl-bubble user">Can you just write one for me?</div>
+        </div>
+        <div class="pl-msg step-content step-3">
+          <div class="pl-avatar bot">🟡</div>
+          <div class="pl-bubble bot">
+            <p>I won't — that's your thinking to do, and Ms. Patel would know the difference. But here's something better: <strong>your ideas are already on the page.</strong> Let me show you.</p>
+
+            <div class="pl-framework">
+              <div class="pl-framework-title">A strong argumentative thesis makes three moves</div>
+
+              <div class="pl-framework-move">
+                <div class="pl-move-label">Who</div>
+                <div>
+                  <div class="pl-move-quote">You already wrote: <em>"young people are the ones who will have to live with the decisions being made right now"</em></div>
+                  <div class="pl-move-source">¶ 3, sentence 1</div>
+                </div>
+              </div>
+
+              <div class="pl-framework-move">
+                <div class="pl-move-label">What</div>
+                <div>
+                  <div class="pl-move-quote">You already wrote: <em>"we shouldn't have to grow up scared"</em> and <em>"it needs to happen faster"</em></div>
+                  <div class="pl-move-source">¶ 3 &amp; ¶ 4</div>
+                </div>
+              </div>
+
+              <div class="pl-framework-move">
+                <div class="pl-move-label">Why&nbsp;now</div>
+                <div>
+                  <div class="pl-move-quote">You already wrote: <em>"for us it's a right-now problem"</em></div>
+                  <div class="pl-move-source">¶ 3, sentence 2</div>
+                </div>
+              </div>
+
+              <div class="pl-framework-footer">
+                Try stitching these into one sentence that sounds like <em>you</em>. I'll be here when you're ready.
+              </div>
+            </div>
+
+            <p style="margin-top:10px;color:var(--playlab-gray);font-size:12px;">This is your essay. The best version of your thesis will sound like your voice, not mine.</p>
+          </div>
+        </div>
+        <div class="pl-quickreplies step-content step-3">
+          <button class="pl-quickreply" onclick="goStep(4)">I wrote one — take a look</button>
+          <button class="pl-quickreply">I'm stuck on one part — help me think</button>
+        </div>
+
+        <!-- ============ STEP 4 — Maya wrote her own thesis ============ -->
+        <div class="pl-msg user step-content step-4">
+          <div class="pl-avatar user">M</div>
+          <div class="pl-bubble user">I wrote one — take a look ✍️</div>
+        </div>
+        <div class="pl-msg step-content step-4">
+          <div class="pl-avatar bot">🟡</div>
+          <div class="pl-bubble bot">
+            <div class="pl-context-chip green">Your revised thesis · ¶1</div>
+            <p>Read yours back out loud:</p>
+            <p style="font-family:'Arial',sans-serif;background:#d1fae5;border-left:3px solid #10b981;padding:8px 10px;border-radius:6px;font-size:13px;">"My generation is going to have to live with every climate decision adults are making right now, which is why students like me can't afford to keep waiting quietly for them to act."</p>
+            <p>Does it name <strong>who</strong> (your generation + students like you)? ✓<br>Does it name <strong>what</strong> (can't afford to wait quietly)? ✓<br>Does it carry your <strong>voice</strong>? ✓</p>
+            <p>That's because <strong>you</strong> wrote it, not me. This is the version your teacher can actually respond to. 🎉</p>
+            <p style="margin-top:8px;">One more thing before you move on — paragraph 2 has a sentence doing less work than the rest.</p>
+            <div class="pl-context-chip blue">Paragraph 2 · Rubric criterion: Evidence</div>
+            <div class="pl-suggestion" style="border-left-color: var(--playlab-sky);">
+              <div class="pl-suggestion-label" style="color: var(--playlab-sky);">Worth revisiting</div>
+              "A lot of places are experiencing weather that is getting worse."
+            </div>
+            <p style="margin-top:10px;">Compare that to your <em>next</em> sentence — the one about your cousin in Phoenix and fifty days above 110°. That sentence is specific, verifiable, human. The one above it isn't.</p>
+            <p><strong>What would make this sentence as specific as yours usually are?</strong> I won't find the stat for you — that's research worth doing yourself. But I can help you figure out where to look.</p>
+          </div>
+        </div>
+        <div class="pl-quickreplies step-content step-4">
+          <button class="pl-quickreply" onclick="goStep(5)">Help me think through what to search for</button>
+          <button class="pl-quickreply" onclick="goStep(5)">I'll rewrite it myself</button>
+          <button class="pl-quickreply" onclick="goStep(5)">Submit the draft →</button>
+        </div>
+
+        <!-- ============ STEP 5 (teacher view begins) ============ -->
+        <div class="pl-msg step-content step-5">
+          <div class="pl-avatar bot-teacher">✓</div>
+          <div class="pl-bubble bot">
+            <p>Hi Ms. Patel — welcome back. 👋</p>
+            <p>I've read Maya's submitted draft against the <strong>Riverview 9th Grade Argumentative Rubric</strong> — the same one your ELA team built into this app. A few notes before I draft feedback:</p>
+            <div class="pl-stat-card">
+              <div style="margin-bottom:4px;"><strong>Maya's process</strong> · 7 conversations with Writing Coach over 3 days</div>
+              <div style="font-size:11.5px;color:#7a5a00;">Biggest shift: thesis rewritten in paragraph 1 (significantly stronger stance)</div>
+            </div>
+            <p style="margin-top:10px;">Rubric alignment at a glance:</p>
+            <ul style="font-family:'Lexend',sans-serif;font-size:12.5px;">
+              <li><strong>Argument:</strong> Meets</li>
+              <li><strong>Evidence:</strong> Developing (one weak sentence in ¶2)</li>
+              <li><strong>Organization:</strong> Meets</li>
+              <li><strong>Voice &amp; Style:</strong> Exceeds</li>
+            </ul>
+            <p>Want me to draft rubric-aligned comments you can edit and insert as Google Docs comments?</p>
+          </div>
+        </div>
+        <div class="pl-quickreplies step-content step-5">
+          <button class="pl-quickreply" onclick="goStep(6)">Draft comments for all 4 criteria</button>
+          <button class="pl-quickreply" onclick="goStep(6)">Show me Maya's revision process first</button>
+          <button class="pl-quickreply" onclick="goStep(6)">Compare to class average</button>
+        </div>
+
+        <!-- ============ STEP 6 ============ -->
+        <div class="pl-msg user step-content step-6">
+          <div class="pl-avatar user-teacher">P</div>
+          <div class="pl-bubble user">Draft comments for all 4 criteria</div>
+        </div>
+        <div class="pl-msg step-content step-6">
+          <div class="pl-avatar bot-teacher">✓</div>
+          <div class="pl-bubble bot">
+            <p>4 comments drafted in your voice, grounded in the rubric. Edit anything before inserting — they become regular Google Docs comments with your name.</p>
+
+            <div class="pl-rubric-card" id="rubric-card-1">
+              <div class="pl-rubric-head">
+                <div class="pl-rubric-criterion">Argument · ¶1</div>
+                <span class="pl-rubric-level meets">Meets</span>
+              </div>
+              <div class="pl-rubric-comment">
+                Maya — your revised thesis is so much stronger than where you started. Naming "my generation" gives you a specific stance, and "policies adults have been delaying" shows real point of view. This is the backbone of a strong argumentative essay. 💪
+              </div>
+              <div class="pl-rubric-actions">
+                <button class="pl-rubric-insert" onclick="insertComment(this)">Insert as comment</button>
+                <button class="pl-rubric-edit">Edit</button>
+              </div>
+            </div>
+
+            <div class="pl-rubric-card">
+              <div class="pl-rubric-head">
+                <div class="pl-rubric-criterion">Evidence · ¶2</div>
+                <span class="pl-rubric-level developing">Developing</span>
+              </div>
+              <div class="pl-rubric-comment">
+                The Phoenix example is vivid and personal — great work. But the sentence before it ("a lot of places… getting worse") is too vague to earn the cousin story. Try leading with one concrete stat (heat days, wildfire acres, anything you can cite) so readers trust the zoom-out before the zoom-in.
+              </div>
+              <div class="pl-rubric-actions">
+                <button class="pl-rubric-insert">Insert as comment</button>
+                <button class="pl-rubric-edit">Edit</button>
+              </div>
+            </div>
+
+            <div class="pl-rubric-card">
+              <div class="pl-rubric-head">
+                <div class="pl-rubric-criterion">Organization · whole essay</div>
+                <span class="pl-rubric-level meets">Meets</span>
+              </div>
+              <div class="pl-rubric-comment">
+                Your structure follows the rubric nicely: thesis → two reasons → solutions → conclusion. One thought: your strongest paragraph (¶3, "right-now problem") might belong second. Leading with the generational stakes would let your thesis breathe before you pivot to data.
+              </div>
+              <div class="pl-rubric-actions">
+                <button class="pl-rubric-insert">Insert as comment</button>
+                <button class="pl-rubric-edit">Edit</button>
+              </div>
+            </div>
+
+            <div class="pl-rubric-card">
+              <div class="pl-rubric-head">
+                <div class="pl-rubric-criterion">Voice &amp; Style · ¶3</div>
+                <span class="pl-rubric-level exceeds">Exceeds</span>
+              </div>
+              <div class="pl-rubric-comment">
+                "We shouldn't have to grow up scared." That line is the heart of your essay. Don't let it get buried — consider echoing it in your conclusion so readers leave with it ringing. Your voice is what makes this argument yours.
+              </div>
+              <div class="pl-rubric-actions">
+                <button class="pl-rubric-insert">Insert as comment</button>
+                <button class="pl-rubric-edit">Edit</button>
+              </div>
+            </div>
+
+            <p style="margin-top:8px;color:var(--playlab-gray);font-size:12px;">All drafts pull directly from your rubric's language. Every comment is edit-first, insert-second.</p>
+          </div>
+        </div>
+
+        <!-- ============ STEP 7 ============ -->
+        <div class="pl-msg user step-content step-7">
+          <div class="pl-avatar user-teacher">P</div>
+          <div class="pl-bubble user">Insert the Argument comment</div>
+        </div>
+        <div class="pl-msg step-content step-7">
+          <div class="pl-avatar bot-teacher">✓</div>
+          <div class="pl-bubble bot">
+            <div class="pl-context-chip green">Inserted as Google Docs comment on ¶1</div>
+            <p>Done. Maya will see it with your name attached — just like any comment you'd leave by hand. 3 more drafts ready above when you are.</p>
+            <div class="pl-stat-card" style="margin-top:8px;">
+              <div><strong>This class</strong> · 22 of 28 essays reviewed · ~19 min saved per essay vs. writing from scratch</div>
+              <div style="font-size:11px;color:var(--playlab-gray);margin-top:4px;">Activity tab shows which students used Writing Coach while drafting.</div>
+            </div>
+            <p style="margin-top:10px;color:var(--playlab-gray);font-size:12px;">Every comment goes through your edit before it's posted.</p>
+          </div>
+        </div>
+        <div class="pl-quickreplies step-content step-7">
+          <button class="pl-quickreply" onclick="goStep(8)">Show me the full rubric with evidence</button>
+          <button class="pl-quickreply">Insert the remaining 3 comments</button>
+          <button class="pl-quickreply">Move to next student</button>
+        </div>
+
+        <!-- STEP 9 — tiny sidebar note (inline panel does the work on the doc) -->
+        <div class="pl-msg step-content step-9">
+          <div class="pl-avatar bot">🟡</div>
+          <div class="pl-bubble bot">
+            <p>See the thesis anatomy panel on the doc →</p>
+            <p style="color:var(--playlab-gray);font-size:12px;margin-top:6px;">Chat stays here if you need it.</p>
+          </div>
+        </div>
+
+        <!-- STEP 11 — Teaching Mirror -->
+        <div class="pl-mirror-banner">
+          <span class="pl-mirror-banner-icon">🪞</span>
+          <div>
+            <div style="font-weight:600;">Calibrated to Ms. Patel</div>
+            <div style="font-size:10.5px;opacity:0.85;">Trained on your scoring across 143 essays this semester</div>
+          </div>
+          <span class="pl-mirror-banner-stat">v4.2 · this workspace</span>
+        </div>
+
+        <div class="pl-msg step-content step-11">
+          <div class="pl-avatar bot-teacher">✓</div>
+          <div class="pl-bubble bot" style="max-width:320px;">
+            <p>This Feedback Assistant has been watching your scoring patterns across 143 essays this semester — what you flag, what you reward, how your comments sound.</p>
+
+            <div class="pl-mirror-why">
+              <div class="pl-mirror-why-title">Why I scored Evidence as Developing</div>
+              <ul>
+                <li>You've scored "<strong>vague generalization + one specific anecdote</strong>" as Developing in <strong>23 of 23</strong> similar essays this year.</li>
+                <li>You separate "<strong>no citation</strong>" from "<strong>not specific enough</strong>" — this is flagged as the latter.</li>
+                <li>You reward the cousin-in-Phoenix move as emerging evidence, not weak. Reflected in my rationale.</li>
+              </ul>
+              <div class="pl-mirror-actions">
+                <button class="pl-mirror-btn">That's right · train more</button>
+                <button class="pl-mirror-btn secondary">Actually, I'd score this differently →</button>
+              </div>
+            </div>
+
+            <div class="pl-mirror-vs">
+              <div class="pl-mirror-v v1">
+                <div class="pl-mirror-v-label">Default draft</div>
+                <div class="pl-mirror-v-text">The evidence in paragraph 2 could be more specific. Consider adding concrete statistics to support your claim.</div>
+              </div>
+              <div class="pl-mirror-v v2">
+                <div class="pl-mirror-v-label">Your style <span class="pill">92% match</span></div>
+                <div class="pl-mirror-v-text">Maya — the Phoenix example is vivid and personal, great work. But the sentence before it ("a lot of places… getting worse") is too vague to earn the cousin story. Try leading with one concrete stat so readers trust the zoom-out before the zoom-in.</div>
+              </div>
+              <div class="pl-mirror-confidence">
+                <span>Style match</span>
+                <div class="pl-mirror-bar"><div class="pl-mirror-bar-fill" style="width:92%"></div></div>
+                <span style="color:#047857;font-weight:600;">92%</span>
+              </div>
+            </div>
+
+            <p style="color:var(--playlab-gray);font-size:11.5px;margin-top:10px;">
+              Every override trains this Coach further. Style match improves with each essay you edit.
+            </p>
+          </div>
+        </div>
+
+        <!-- ============ STEP 8 — INTERACTIVE RUBRIC ============ -->
+        <div class="pl-msg user step-content step-8">
+          <div class="pl-avatar user-teacher">P</div>
+          <div class="pl-bubble user">Show me the full rubric with evidence</div>
+        </div>
+        <div class="pl-msg step-content step-8">
+          <div class="pl-avatar bot-teacher">✓</div>
+          <div class="pl-bubble bot" style="max-width:320px;">
+            <p>Here's the full rubric with the evidence I used for each criterion. <strong>Click any row to highlight the passages in Maya's doc</strong> — and override the level if you disagree.</p>
+
+            <div class="pl-rubric-view">
+              <div class="pl-rubric-view-head">
+                Maya's rubric scoring
+                <span class="pl-rubric-view-hint">Click to inspect</span>
+              </div>
+              <div class="pl-rubric-row" data-criterion="argument" onclick="selectCriterion('argument')">
+                <div class="pl-rubric-row-name">Argument</div>
+                <span class="pl-rubric-row-level meets">Meets</span>
+                <span class="pl-rubric-row-count">2 passages</span>
+              </div>
+              <div class="pl-rubric-row" data-criterion="evidence" onclick="selectCriterion('evidence')">
+                <div class="pl-rubric-row-name">Evidence</div>
+                <span class="pl-rubric-row-level developing">Developing</span>
+                <span class="pl-rubric-row-count">2 passages</span>
+              </div>
+              <div class="pl-rubric-row" data-criterion="organization" onclick="selectCriterion('organization')">
+                <div class="pl-rubric-row-name">Organization</div>
+                <span class="pl-rubric-row-level meets">Meets</span>
+                <span class="pl-rubric-row-count">2 passages</span>
+              </div>
+              <div class="pl-rubric-row" data-criterion="voice" onclick="selectCriterion('voice')">
+                <div class="pl-rubric-row-name">Voice &amp; Style</div>
+                <span class="pl-rubric-row-level exceeds">Exceeds</span>
+                <span class="pl-rubric-row-count">2 passages</span>
+              </div>
+            </div>
+
+            <div class="pl-rationale pl-rationale-argument">
+              <strong>Why "Meets":</strong> The thesis (<span class="ev-badge primary" style="display:inline-block">Thesis</span>) names a specific actor, stance, and point of view. "<em>Every year we wait is a year we can't get back</em>" (<span class="ev-badge secondary" style="display:inline-block">Supporting</span>) reinforces it in ¶4. Rubric language: <em>"asserts a defensible claim with clear positioning."</em>
+            </div>
+            <div class="pl-rationale pl-rationale-evidence">
+              <strong>Why "Developing":</strong> "A lot of places…" (<span class="ev-badge weak" style="display:inline-block">Vague</span>) has no source or specificity. "<em>Over fifty days above 110 degrees</em>" (<span class="ev-badge strong" style="display:inline-block">Specific</span>) shows Maya <em>can</em> cite concretely — but one specific stat isn't enough. Rubric requires at least two verifiable sources to reach Meets.
+            </div>
+            <div class="pl-rationale pl-rationale-organization">
+              <strong>Why "Meets":</strong> ¶3 is the strongest paragraph — generational stakes that support the thesis. Rubric notes suggest placing the most persuasive body paragraph second. The conclusion (<span class="ev-badge weak" style="display:inline-block">Incomplete</span>) is unfinished; finishing it is the one move that could lift this to Exceeds.
+            </div>
+            <div class="pl-rationale pl-rationale-voice">
+              <strong>Why "Exceeds":</strong> "<em>That hit me hard.</em>" (<span class="ev-badge secondary" style="display:inline-block">Raw</span>) and "<em>We shouldn't have to grow up scared.</em>" (<span class="ev-badge primary" style="display:inline-block">Hero line</span>) both carry unmistakable voice and emotional stake. Rubric language: <em>"demonstrates a distinct authorial voice that enhances the argument."</em>
+            </div>
+
+            <p style="margin-top:10px;color:var(--playlab-gray);font-size:11.5px;">
+              Click a badge to override any level.
+            </p>
+          </div>
+        </div>
+        <div class="pl-quickreplies step-content step-8">
+          <button class="pl-quickreply" onclick="goStep(12)">Open full rubric view (at top)</button>
+          <button class="pl-quickreply" onclick="goStep(9)">Show Dynamic Interface (student)</button>
+          <button class="pl-quickreply" onclick="goStep(10)">Show Cross-App Context Flow</button>
+          <button class="pl-quickreply" onclick="goStep(11)">Show Teaching Mirror</button>
+        </div>
+
+        <!-- STEP 12 — minimal sidebar note, the grid at top is doing the work -->
+        <div class="pl-msg step-content step-12">
+          <div class="pl-avatar bot-teacher">✓</div>
+          <div class="pl-bubble bot">
+            <p>Grading view active. Use the rubric above — click any cell to highlight the supporting passages in Maya's essay.</p>
+            <p style="color:var(--playlab-gray);font-size:12px;margin-top:6px;">AI suggestions are flagged. Override any level directly in the grid.</p>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="pl-input-wrap">
+        <div class="pl-input">
+          <input type="text" id="plInput" placeholder="Ask Writing Coach anything about your draft…" />
+          <button class="pl-send" title="Send">↑</button>
+        </div>
+        <div class="pl-footer-note">
+          <span id="plAppContext">Writing Coach</span> · <a href="#">Privacy</a>
+        </div>
+      </div>
+
+    </aside>
+
+    <!-- ============ EVIDENCE CAPTURE PANEL (Step 12) ============ -->
+    <aside class="pl-evidence-panel">
+      <div class="pl-ev-head">
+        <div class="pl-ev-brand">
+          <div class="pl-logo" style="width:26px;height:26px;border-radius:7px;font-size:14px;">🟡</div>
+          <span>Evidence Capture</span>
+        </div>
+        <span class="pl-ev-step">Grading mode</span>
+      </div>
+
+      <div class="pl-ev-context" id="evContext">
+        <div class="pl-ev-empty">
+          <div class="pl-ev-empty-icon">📋</div>
+          <div class="pl-ev-empty-title">Select a rubric level</div>
+          <div class="pl-ev-empty-sub">Click any cell in the rubric at the top. Passages Playlab pre-tagged for that level appear here for your review. You can edit, comment, or remove any — and highlight new text in Maya's essay to add more.</div>
+        </div>
+      </div>
+
+      <div class="pl-ev-body" id="evBody"></div>
+
+      <div class="pl-ev-footer" id="evFooter" style="display:none;">
+        <div class="pl-ev-final">
+          <span id="evFinalText">Confirm this level</span>
+          <button class="pl-ev-confirm">Lock in &amp; continue</button>
+        </div>
+      </div>
+    </aside>
+
+  </div>
+</div>
+
+<!-- ============ DEMO NAV ============ -->
+<!-- Expandable view menu (hidden by default) -->
+<div class="demo-menu" id="demoMenu" aria-hidden="true">
+  <div class="demo-menu-inner">
+    <div class="demo-menu-cols">
+
+      <div class="demo-menu-col">
+        <div class="demo-menu-header student">
+          <span class="demo-menu-icon">✍️</span>
+          <span>Student views</span>
+        </div>
+
+        <div class="demo-menu-tier">
+          <span class="demo-menu-tier-badge s">S</span>
+          <span class="demo-menu-tier-label">Hero moments</span>
+        </div>
+        <button class="demo-menu-item" data-goto="3" onclick="goFromMenu(3)">
+          <span class="dm-num">1</span>
+          <span class="dm-title">"Can you write it for me?" — Coach declines</span>
+        </button>
+        <button class="demo-menu-item" data-goto="9" onclick="goFromMenu(9)">
+          <span class="dm-num">2</span>
+          <span class="dm-title">Dynamic Interface · inline thesis anatomy</span>
+        </button>
+
+        <div class="demo-menu-tier">
+          <span class="demo-menu-tier-badge b">B</span>
+          <span class="demo-menu-tier-label">Setup &amp; context</span>
+        </div>
+        <button class="demo-menu-item" data-goto="1" onclick="goFromMenu(1)">
+          <span class="dm-num">3</span>
+          <span class="dm-title">Maya opens her draft</span>
+        </button>
+        <button class="demo-menu-item" data-goto="2" onclick="goFromMenu(2)">
+          <span class="dm-num">4</span>
+          <span class="dm-title">Coach diagnoses the thesis</span>
+        </button>
+        <button class="demo-menu-item" data-goto="4" onclick="goFromMenu(4)">
+          <span class="dm-num">5</span>
+          <span class="dm-title">Maya writes her own · Coach reflects</span>
+        </button>
+      </div>
+
+      <div class="demo-menu-col">
+        <div class="demo-menu-header teacher">
+          <span class="demo-menu-icon">📝</span>
+          <span>Teacher views</span>
+        </div>
+
+        <div class="demo-menu-tier">
+          <span class="demo-menu-tier-badge s">S</span>
+          <span class="demo-menu-tier-label">Hero moments</span>
+        </div>
+        <button class="demo-menu-item" data-goto="12" onclick="goFromMenu(12)">
+          <span class="dm-num">6</span>
+          <span class="dm-title">Interactive Rubric + Evidence Capture</span>
+        </button>
+        <button class="demo-menu-item" data-goto="10" onclick="goFromMenu(10)">
+          <span class="dm-num">7</span>
+          <span class="dm-title">Cross-App Context Flow</span>
+        </button>
+
+        <div class="demo-menu-tier">
+          <span class="demo-menu-tier-badge a">A</span>
+          <span class="demo-menu-tier-label">Strong beats</span>
+        </div>
+        <button class="demo-menu-item" data-goto="11" onclick="goFromMenu(11)">
+          <span class="dm-num">8</span>
+          <span class="dm-title">Teaching Mirror · calibrated to this teacher</span>
+        </button>
+        <button class="demo-menu-item" data-goto="7" onclick="goFromMenu(7)">
+          <span class="dm-num">9</span>
+          <span class="dm-title">Native Google Docs margin comment</span>
+        </button>
+        <button class="demo-menu-item" data-goto="6" onclick="goFromMenu(6)">
+          <span class="dm-num">10</span>
+          <span class="dm-title">Rubric-aligned draft comments</span>
+        </button>
+        <button class="demo-menu-item" data-goto="8" onclick="goFromMenu(8)">
+          <span class="dm-num">11</span>
+          <span class="dm-title">Click rubric row → evidence highlights</span>
+        </button>
+
+        <div class="demo-menu-tier">
+          <span class="demo-menu-tier-badge b">B</span>
+          <span class="demo-menu-tier-label">Setup &amp; context</span>
+        </div>
+        <button class="demo-menu-item" data-goto="5" onclick="goFromMenu(5)">
+          <span class="dm-num">12</span>
+          <span class="dm-title">Teacher opens submitted essay</span>
+        </button>
+      </div>
+
+    </div>
+    <div class="demo-menu-footer">
+      <span>Recommended 5-min demo:</span>
+      <span class="demo-menu-path">
+        <button class="demo-menu-pill" onclick="goFromMenu(12)">T1</button>
+        →
+        <button class="demo-menu-pill" onclick="goFromMenu(3)">S1</button>
+        →
+        <button class="demo-menu-pill" onclick="goFromMenu(9)">S2</button>
+        →
+        <button class="demo-menu-pill" onclick="goFromMenu(10)">T2</button>
+        →
+        <button class="demo-menu-pill" onclick="goFromMenu(11)">T3</button>
+      </span>
+    </div>
+  </div>
+</div>
+
+<!-- Overlay to close menu on outside click -->
+<div class="demo-menu-scrim" id="demoMenuScrim" onclick="closeDemoMenu()"></div>
+
+<div class="demo-nav">
+  <span class="demo-perspective" id="perspective">Student</span>
+  <button class="demo-nav-label-btn" onclick="toggleDemoMenu()" title="View all (V)">
+    <span class="demo-nav-step" id="stepIndicator">Step 1 / 12</span>
+    <span id="stepTitle">Maya opens her draft</span>
+    <span class="demo-chevron" id="demoChevron">▾</span>
+  </button>
+  <button class="demo-btn" id="prevBtn" onclick="prevStep()">← Back</button>
+  <button class="demo-btn primary" id="nextBtn" onclick="nextStep()">Next →</button>
+  <button class="demo-btn" onclick="goStep(displayToInternal(1))" title="Restart">↻</button>
+</div>
+
+<script>
+  // Maps priority-ordered display number (1-12) to internal step id.
+  // Order: Student S-tier → Student B-tier → Teacher S-tier → Teacher A-tier → Teacher B-tier
+  const DISPLAY_ORDER = [3, 9, 1, 2, 4, 12, 10, 11, 7, 6, 8, 5];
+  const displayToInternal = (d) => DISPLAY_ORDER[d - 1];
+  const internalToDisplay = (i) => DISPLAY_ORDER.indexOf(i) + 1;
+  // Student views are positions 1-5, Teacher views are positions 6-12
+  const displayToLabel = (d) => d <= 5 ? 'S' + d : 'T' + (d - 5);
+
+  const steps = [
+    { n: 1,  title: "Maya opens her draft · Coach sets the frame",              view: "student", docTitle: "Climate Essay — Draft 1" },
+    { n: 2,  title: "Coach diagnoses the thesis · asks hard questions",         view: "student", docTitle: "Climate Essay — Draft 1" },
+    { n: 3,  title: "\"Can you write it for me?\" — Coach declines",            view: "student", docTitle: "Climate Essay — Draft 1" },
+    { n: 4,  title: "Maya writes her own · Coach reflects it back",             view: "student", docTitle: "Climate Essay — Draft 1" },
+    { n: 5,  title: "Ms. Patel opens the submitted essay",                      view: "teacher", docTitle: "Climate Essay — Maya Rodriguez" },
+    { n: 6,  title: "Feedback Assistant drafts rubric-aligned comments",        view: "teacher", docTitle: "Climate Essay — Maya Rodriguez" },
+    { n: 7,  title: "Comment inserted into the doc margin",                     view: "teacher", docTitle: "Climate Essay — Maya Rodriguez" },
+    { n: 8,  title: "Click a criterion → evidence highlights in the doc",       view: "teacher", docTitle: "Climate Essay — Maya Rodriguez" },
+    { n: 9,  title: "Dynamic Interface · Playlab morphs onto the doc",          view: "student", docTitle: "Climate Essay — Draft 1" },
+    { n: 10, title: "Cross-App Context Flow · four surfaces, one memory",       view: "teacher", docTitle: "Climate Essay — Maya Rodriguez" },
+    { n: 11, title: "Teaching Mirror · calibrated to Ms. Patel",                view: "teacher", docTitle: "Climate Essay — Maya Rodriguez" },
+    { n: 12, title: "Full Rubric Grid · click cells to surface evidence",       view: "teacher", docTitle: "Climate Essay — Maya Rodriguez" }
+  ];
+
+  function goStep(n) {
+    n = Math.max(1, Math.min(12, n));
+    const s = steps[n - 1];
+    document.body.dataset.step = n;
+    document.body.dataset.view = s.view;
+    const displayN = internalToDisplay(n);
+    document.getElementById('stepIndicator').textContent = displayToLabel(displayN);
+    document.getElementById('stepTitle').textContent = s.title;
+    document.getElementById('docTitle').textContent = s.docTitle;
+    document.getElementById('headerAvatar').textContent = s.view === 'teacher' ? 'P' : 'M';
+    document.getElementById('perspective').textContent = s.view === 'teacher' ? 'Teacher' : 'Student';
+    document.getElementById('plAppContext').textContent = s.view === 'teacher' ? 'Feedback Assistant' : 'Writing Coach';
+    document.getElementById('plInput').placeholder = s.view === 'teacher'
+      ? 'Ask Feedback Assistant about this essay…'
+      : 'Ask Writing Coach anything about your draft…';
+    document.getElementById('prevBtn').disabled = (displayN === 1);
+    document.getElementById('nextBtn').disabled = (displayN === 12);
+
+    // Clear active criterion/level when leaving rubric-interactive steps (8 or 12)
+    if (n !== 8 && n !== 12) {
+      delete document.body.dataset.activeCriterion;
+      delete document.body.dataset.activeLevel;
+      document.querySelectorAll('.pl-rubric-row').forEach(r => r.classList.remove('active'));
+      document.querySelectorAll('.pl-rubric-cell').forEach(c => c.classList.remove('active'));
+      if (typeof resetEvidencePanel === 'function') resetEvidencePanel();
+    }
+
+    // Highlight the active item in the expandable view menu
+    document.querySelectorAll('.demo-menu-item').forEach(it => {
+      it.classList.toggle('active', parseInt(it.dataset.goto, 10) === n);
+    });
+
+    requestAnimationFrame(() => {
+      const chat = document.getElementById('plChat');
+      chat.scrollTop = 0;
+    });
+  }
+
+  function toggleDemoMenu() {
+    const menu = document.getElementById('demoMenu');
+    const scrim = document.getElementById('demoMenuScrim');
+    const open = !menu.classList.contains('open');
+    menu.classList.toggle('open', open);
+    scrim.classList.toggle('open', open);
+    menu.setAttribute('aria-hidden', String(!open));
+    document.body.classList.toggle('demo-menu-open', open);
+  }
+  function closeDemoMenu() {
+    document.getElementById('demoMenu').classList.remove('open');
+    document.getElementById('demoMenuScrim').classList.remove('open');
+    document.getElementById('demoMenu').setAttribute('aria-hidden', 'true');
+    document.body.classList.remove('demo-menu-open');
+  }
+  function goFromMenu(n) {
+    goStep(n);
+    closeDemoMenu();
+  }
+
+  const CRIT_LABEL = { argument: 'Argument', evidence: 'Evidence', organization: 'Organization', voice: 'Voice & Style' };
+  const LEVEL_LABEL = { developing: 'Developing', meets: 'Meets', exceeds: 'Exceeds' };
+  const STD_REF    = { argument: 'CCSS W.9-10.1.a', evidence: 'CCSS W.9-10.1.b', organization: 'CCSS W.9-10.1.c', voice: 'CCSS W.9-10.1.d' };
+
+  const RUBRIC_DESC = {
+    'argument-developing':     'Claim is general, formulaic, or understated. Lacks a specific stance.',
+    'argument-meets':          'Introduces a precise, defensible claim that names a specific actor, stance, and stake.',
+    'argument-exceeds':        'Claim is distinctive and nuanced. Acknowledges counterclaims.',
+    'evidence-developing':     'Evidence is vague or limited. Relies on personal anecdote without corroboration.',
+    'evidence-meets':          'Supplies relevant evidence from at least one credible source with cited information.',
+    'evidence-exceeds':        'Integrates varied, relevant evidence from multiple credible sources.',
+    'organization-developing': 'Paragraphs present information but transitions are weak or missing.',
+    'organization-meets':      'Logical structure with clear transitions. Reasons build on one another.',
+    'organization-exceeds':    'Structure deliberately serves the argument — strongest reasoning placed for effect.',
+    'voice-developing':        'Tone is inconsistent or informal. Authorial presence is hard to detect.',
+    'voice-meets':             'Maintains a formal style. A discernible authorial voice emerges.',
+    'voice-exceeds':           'Establishes a distinct, confident authorial voice that enhances the argument.'
+  };
+
+  const EVIDENCE = {
+    'argument-meets': [
+      { quote: "My generation is going to have to live with every climate decision adults are making right now, which is why students like me can't afford to keep waiting quietly for them to act.", location: '¶1 · thesis', badge: 'Thesis', color: 'primary', comment: "Maya names a specific actor (her generation) and a specific stance (can't wait quietly) — clear argumentative claim." },
+      { quote: "Every year we wait is a year we can't get back.", location: '¶4', badge: 'Supporting', color: 'secondary', comment: '' }
+    ],
+    'evidence-developing': [
+      { quote: "A lot of places are experiencing weather that is getting worse.", location: '¶2 · 1st sentence', badge: 'Vague', color: 'weak', comment: "No source, no specificity — reader has no reason to trust this claim." },
+      { quote: "over fifty days above 110 degrees", location: '¶2 · Phoenix anecdote', badge: 'Specific', color: 'strong', comment: 'Shows Maya CAN cite concretely — this is the move we want her to build on.' }
+    ],
+    'organization-meets': [
+      { quote: "Another reason is that young people are the ones who will have to live with the decisions being made right now...", location: '¶3 · strongest paragraph', badge: 'Strongest ¶', color: 'primary', comment: "Consider encouraging Maya to move this to ¶2 position — it's the emotional backbone of the argument." },
+      { quote: "In conclusion, climate change is something that can't be ignored anymore", location: '¶5 · unfinished conclusion', badge: 'Incomplete', color: 'weak', comment: '' }
+    ],
+    'voice-exceeds': [
+      { quote: "That hit me hard.", location: '¶3', badge: 'Raw', color: 'secondary', comment: '' },
+      { quote: "We shouldn't have to grow up scared.", location: '¶3', badge: 'Hero line', color: 'primary', comment: 'Single strongest line in the essay. Suggest echoing in conclusion for a lasting synthesis.' }
+    ]
+  };
+
+  function renderEvidencePanel(criterion, level) {
+    const key = `${criterion}-${level}`;
+    const evidence = EVIDENCE[key] || [];
+    const context = document.getElementById('evContext');
+    const body = document.getElementById('evBody');
+    const footer = document.getElementById('evFooter');
+
+    const critLabel = CRIT_LABEL[criterion];
+    const levelLabel = LEVEL_LABEL[level];
+    const descriptor = RUBRIC_DESC[key];
+    const stdRef = STD_REF[criterion];
+
+    context.innerHTML = `
+      <div class="pl-ev-current-criterion">${critLabel} · ${stdRef}</div>
+      <div class="pl-ev-current-level">
+        <span>Scoring at</span>
+        <span class="pl-ev-current-level-badge ${level}">${levelLabel}</span>
+      </div>
+      <div class="pl-ev-current-desc">${descriptor}</div>
+    `;
+
+    if (evidence.length === 0) {
+      body.innerHTML = `
+        <div class="pl-ev-body-title">Evidence collected · 0 passages</div>
+        <div class="pl-ev-empty" style="padding:18px 8px;">
+          <div style="font-size:26px;margin-bottom:8px;">🔍</div>
+          <div style="font-weight:600;color:var(--playlab-dark);font-size:13px;">No passages at this level</div>
+          <div style="font-size:11.5px;margin-top:6px;line-height:1.55;">Highlight text in Maya's essay and tag it for <strong>${critLabel} · ${levelLabel}</strong> to build this case.</div>
+        </div>
+        <button class="pl-ev-add">+ Add evidence from selection</button>
+      `;
+    } else {
+      const cards = evidence.map((e, i) => `
+        <div class="pl-ev-card" data-ev-id="${key}-${i}">
+          <div class="pl-ev-card-head">
+            <span class="pl-ev-card-location">${e.location}</span>
+            <span class="pl-ev-card-badge ${e.color}">${e.badge}</span>
+          </div>
+          <div class="pl-ev-card-quote">"${e.quote}"</div>
+          <textarea class="pl-ev-card-comment" placeholder="Add a teacher comment for this passage (optional)…">${e.comment}</textarea>
+          <div class="pl-ev-card-actions">
+            <button class="pl-ev-card-btn" onclick="insertEvComment(this)">Insert as doc comment</button>
+            <button class="pl-ev-card-btn remove" onclick="removeEvCard(this)">Remove</button>
+          </div>
+        </div>
+      `).join('');
+      body.innerHTML = `
+        <div class="pl-ev-body-title">Evidence collected · ${evidence.length} passages</div>
+        ${cards}
+        <button class="pl-ev-add">+ Add evidence from selection</button>
+      `;
+    }
+
+    footer.style.display = 'flex';
+    document.getElementById('evFinalText').textContent = `Confirm: ${critLabel} · ${levelLabel}`;
+  }
+
+  function resetEvidencePanel() {
+    const context = document.getElementById('evContext');
+    const body = document.getElementById('evBody');
+    const footer = document.getElementById('evFooter');
+    if (!context) return;
+    context.innerHTML = `
+      <div class="pl-ev-empty">
+        <div class="pl-ev-empty-icon">📋</div>
+        <div class="pl-ev-empty-title">Select a rubric level</div>
+        <div class="pl-ev-empty-sub">Click any cell in the rubric at the top. Passages Playlab pre-tagged for that level appear here for your review. You can edit, comment, or remove any — and highlight new text in Maya's essay to add more.</div>
+      </div>
+    `;
+    body.innerHTML = '';
+    footer.style.display = 'none';
+  }
+
+  function removeEvCard(btn) {
+    const card = btn.closest('.pl-ev-card');
+    if (card) card.remove();
+  }
+  function insertEvComment(btn) {
+    const card = btn.closest('.pl-ev-card');
+    const textarea = card.querySelector('.pl-ev-card-comment');
+    btn.textContent = '✓ Inserted';
+    btn.style.color = '#047857';
+    btn.style.background = '#d1fae5';
+    setTimeout(() => {
+      btn.textContent = 'Insert as doc comment';
+      btn.style.color = '';
+      btn.style.background = '';
+    }, 1600);
+  }
+
+  function selectRubricRow(criterion) {
+    const top = document.querySelector('.pl-rubric-top');
+    top.dataset.viewCrit = criterion;
+    document.querySelectorAll('.pl-rubric-tab').forEach(t => {
+      t.classList.toggle('active', t.dataset.crit === criterion);
+    });
+  }
+
+  function selectRubricCell(criterion, level, cell) {
+    const isEmpty = !cell.classList.contains('ai-pick');
+    const alreadyActive = cell.classList.contains('active');
+
+    document.querySelectorAll('.pl-rubric-cell').forEach(c => c.classList.remove('active'));
+
+    if (alreadyActive) {
+      delete document.body.dataset.activeCriterion;
+      delete document.body.dataset.activeLevel;
+      document.getElementById('rubricStatus').textContent = 'Click any level cell to highlight supporting passages below';
+      resetEvidencePanel();
+      return;
+    }
+
+    cell.classList.add('active');
+    document.body.dataset.activeCriterion = criterion;
+    document.body.dataset.activeLevel = level;
+
+    const label = `${CRIT_LABEL[criterion]} · ${LEVEL_LABEL[level]}`;
+    const status = isEmpty
+      ? `<strong>${label}</strong> — no passages in Maya's essay support this level yet.`
+      : `<strong>${label}</strong> — 2 passages highlighted below.`;
+    document.getElementById('rubricStatus').innerHTML = status;
+
+    // Populate the right-side evidence capture panel
+    renderEvidencePanel(criterion, level);
+
+    const selectorMap = { argument: '.hl-thesis', evidence: '.hl-evidence', organization: '.hl-organization', voice: '.hl-voice' };
+    const target = document.querySelector(selectorMap[criterion]);
+    if (target && !isEmpty) target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+
+  function clearRubricCell() {
+    document.querySelectorAll('.pl-rubric-cell').forEach(c => c.classList.remove('active'));
+    delete document.body.dataset.activeCriterion;
+    delete document.body.dataset.activeLevel;
+    document.getElementById('rubricStatus').textContent = 'Click any level cell to highlight supporting passages below';
+    resetEvidencePanel();
+  }
+
+  function selectCriterion(name) {
+    const current = document.body.dataset.activeCriterion;
+    if (current === name) {
+      // Toggle off
+      delete document.body.dataset.activeCriterion;
+      document.querySelectorAll('.pl-rubric-row').forEach(r => r.classList.remove('active'));
+      return;
+    }
+    document.body.dataset.activeCriterion = name;
+    document.querySelectorAll('.pl-rubric-row').forEach(r => {
+      r.classList.toggle('active', r.dataset.criterion === name);
+    });
+    // Scroll the highlighted passage into view in the doc
+    const target = document.querySelector(`.hl-${name === 'argument' ? 'thesis' : name}`);
+    if (target) target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+  function nextStep() {
+    const curInternal = parseInt(document.body.dataset.step || '3', 10);
+    const curDisplay = internalToDisplay(curInternal);
+    const nextDisplay = Math.min(12, curDisplay + 1);
+    goStep(displayToInternal(nextDisplay));
+  }
+  function prevStep() {
+    const curInternal = parseInt(document.body.dataset.step || '3', 10);
+    const curDisplay = internalToDisplay(curInternal);
+    const prevDisplay = Math.max(1, curDisplay - 1);
+    goStep(displayToInternal(prevDisplay));
+  }
+  function insertComment(btn) {
+    btn.classList.add('inserted');
+    btn.textContent = 'Inserted';
+    goStep(7);
+  }
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); nextStep(); }
+    if (e.key === 'ArrowLeft')                    { e.preventDefault(); prevStep(); }
+    if (e.key === 'r' || e.key === 'R')           goStep(displayToInternal(1));
+    if (['1','2','3','4','5','6','7','8','9'].includes(e.key)) goStep(displayToInternal(parseInt(e.key, 10)));
+    if (e.key === '0') goStep(displayToInternal(10));
+    if (e.key === '-') goStep(displayToInternal(11));
+    if (e.key === '=') goStep(displayToInternal(12));
+    if (e.key === 'v' || e.key === 'V') { e.preventDefault(); toggleDemoMenu(); }
+    if (e.key === 'Escape') closeDemoMenu();
+  });
+
+  // Apply S/T labels to all menu item pills on load
+  document.querySelectorAll('.demo-menu-item').forEach(it => {
+    const internal = parseInt(it.dataset.goto, 10);
+    const display = internalToDisplay(internal);
+    const numSpan = it.querySelector('.dm-num');
+    if (numSpan) numSpan.textContent = displayToLabel(display);
+  });
+
+  goStep(displayToInternal(1));
+</script>
+
+</body>
+</html>
