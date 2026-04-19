@@ -1543,6 +1543,10 @@
   /* In step 12, hide chat sidebar and show evidence capture panel */
   body[data-step="12"] .pl-sidebar         { display: none; }
   body[data-step="12"] .pl-evidence-panel  { display: flex; }
+  /* Hide the submitted banner in T1 so the rubric sits flush at the top */
+  body[data-step="12"] .submitted-banner   { display: none; }
+  body[data-step="12"] .gdocs-canvas       { padding-top: 8px; }
+  body[data-step="12"] .pl-rubric-top      { margin-top: 0; }
 
   .pl-evidence-panel {
     width: 400px;
