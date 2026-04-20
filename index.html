@@ -1287,6 +1287,20 @@
     margin-bottom: 12px;
   }
   .pl-rubric-panel-intro strong { font-weight: 600; }
+  .panel-intro-level {
+    font-size: 9.5px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 2px 8px;
+    border-radius: 999px;
+    margin: 0 4px;
+    vertical-align: 1px;
+    display: inline-block;
+  }
+  .panel-intro-level.meets    { background: #d1fae5; color: #047857; }
+  .panel-intro-level.develop  { background: #fff6d9; color: #8a6d00; }
+  .panel-intro-level.exceed   { background: #e0f2fe; color: #0369a1; }
   .std-ref {
     font-size: 10px;
     color: var(--playlab-gray);
@@ -1558,30 +1572,51 @@
     font-family: 'Lexend', sans-serif;
   }
   .pl-ev-head {
-    padding: 12px 18px;
+    padding: 14px 18px;
     border-bottom: 1px solid #e8eef0;
     background: white;
     display: flex;
     justify-content: space-between;
-    align-items: center;
+    align-items: flex-start;
+    gap: 12px;
   }
-  .pl-ev-brand {
-    display: flex;
-    gap: 8px;
-    align-items: center;
+  .pl-ev-doc-title {
+    font-size: 15px;
     font-weight: 600;
     color: var(--playlab-dark);
-    font-size: 14px;
+    line-height: 1.3;
   }
-  .pl-ev-step {
-    font-size: 10px;
-    color: var(--playlab-sky);
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
+  .pl-ev-rubric-title {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--playlab-dark);
+    margin-top: 4px;
+  }
+  .pl-ev-rubric-sub {
+    font-size: 10.5px;
+    color: var(--playlab-gray);
+    margin-top: 2px;
+    line-height: 1.4;
+  }
+  .pl-ev-composite {
+    flex-shrink: 0;
+    text-align: right;
+    background: #f1f5f9;
+    padding: 6px 10px;
+    border-radius: 8px;
+  }
+  .pl-ev-composite-label {
+    font-size: 9.5px;
     font-weight: 700;
-    background: #e0f2fe;
-    padding: 3px 8px;
-    border-radius: 999px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--playlab-gray);
+  }
+  .pl-ev-composite-value {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--playlab-dark);
+    margin-top: 2px;
   }
   .pl-ev-context {
     padding: 14px 18px;
@@ -2678,14 +2713,6 @@
 
       <!-- STEP 12 · Interactive rubric at top — one criterion at a time -->
       <div class="pl-rubric-top" data-view-crit="argument">
-        <div class="pl-rubric-top-head">
-          <div>
-            <div class="pl-rubric-top-title">Grade Maya's essay · 9th Grade Argumentative Rubric</div>
-            <div class="pl-rubric-top-sub">Adapted from CCSS W.9-10.1 &amp; SBAC Argumentative Writing Rubric · open source</div>
-          </div>
-          <div class="pl-rubric-top-overall">Composite: <strong>Meets</strong> · 14/16</div>
-        </div>
-
         <div class="pl-rubric-tabs">
           <button class="pl-rubric-tab active" data-crit="argument"     onclick="selectRubricRow('argument')">
             <span class="tab-name">Argument</span><span class="tab-level meets">Meets</span>
@@ -2706,7 +2733,7 @@
           <!-- ARGUMENT -->
           <div class="pl-rubric-panel" data-crit="argument">
             <div class="pl-rubric-panel-intro">
-              <strong>Argument</strong> — Introduce and sustain a precise, defensible claim that establishes the significance of the topic. <span class="std-ref">CCSS W.9-10.1.a</span>
+              <strong>Argument</strong> <span class="panel-intro-level meets">Meets</span> — Introduce and sustain a precise, defensible claim that establishes the significance of the topic. <span class="std-ref">CCSS W.9-10.1.a</span>
             </div>
             <div class="pl-rubric-levels">
               <div class="pl-rubric-cell" data-level="developing" onclick="selectRubricCell('argument','developing',this)">
@@ -2730,7 +2757,7 @@
           <!-- EVIDENCE -->
           <div class="pl-rubric-panel" data-crit="evidence">
             <div class="pl-rubric-panel-intro">
-              <strong>Evidence</strong> — Supply relevant and sufficient evidence from credible sources, demonstrating an understanding of the topic. <span class="std-ref">CCSS W.9-10.1.b</span>
+              <strong>Evidence</strong> <span class="panel-intro-level develop">Developing</span> — Supply relevant and sufficient evidence from credible sources, demonstrating an understanding of the topic. <span class="std-ref">CCSS W.9-10.1.b</span>
             </div>
             <div class="pl-rubric-levels">
               <div class="pl-rubric-cell ai-pick" data-level="developing" onclick="selectRubricCell('evidence','developing',this)">
@@ -2754,7 +2781,7 @@
           <!-- ORGANIZATION -->
           <div class="pl-rubric-panel" data-crit="organization">
             <div class="pl-rubric-panel-intro">
-              <strong>Organization</strong> — Create cohesion and clarify the relationships among claim, reasons, and evidence. <span class="std-ref">CCSS W.9-10.1.c</span>
+              <strong>Organization</strong> <span class="panel-intro-level meets">Meets</span> — Create cohesion and clarify the relationships among claim, reasons, and evidence. <span class="std-ref">CCSS W.9-10.1.c</span>
             </div>
             <div class="pl-rubric-levels">
               <div class="pl-rubric-cell" data-level="developing" onclick="selectRubricCell('organization','developing',this)">
@@ -2778,7 +2805,7 @@
           <!-- VOICE & STYLE -->
           <div class="pl-rubric-panel" data-crit="voice">
             <div class="pl-rubric-panel-intro">
-              <strong>Voice &amp; Style</strong> — Establish and maintain a formal style and an objective tone appropriate to the discipline. <span class="std-ref">CCSS W.9-10.1.d</span>
+              <strong>Voice &amp; Style</strong> <span class="panel-intro-level exceed">Exceeds</span> — Establish and maintain a formal style and an objective tone appropriate to the discipline. <span class="std-ref">CCSS W.9-10.1.d</span>
             </div>
             <div class="pl-rubric-levels">
               <div class="pl-rubric-cell" data-level="developing" onclick="selectRubricCell('voice','developing',this)">
@@ -2799,11 +2826,6 @@
             </div>
           </div>
 
-        </div>
-
-        <div class="pl-rubric-top-footer">
-          <span id="rubricStatus">Click any level cell to highlight supporting passages below</span>
-          <button class="pl-rubric-top-footer-btn" onclick="clearRubricCell()">Clear selection</button>
         </div>
       </div>
 
@@ -3316,11 +3338,15 @@
     <!-- ============ EVIDENCE CAPTURE PANEL (Step 12) ============ -->
     <aside class="pl-evidence-panel">
       <div class="pl-ev-head">
-        <div class="pl-ev-brand">
-          <div class="pl-logo" style="width:26px;height:26px;border-radius:7px;font-size:14px;">🟡</div>
-          <span>Evidence Capture</span>
+        <div>
+          <div class="pl-ev-doc-title">Grade Maya's essay</div>
+          <div class="pl-ev-rubric-title">9th Grade Argumentative Rubric</div>
+          <div class="pl-ev-rubric-sub">Adapted from CCSS W.9-10.1 &amp; SBAC · open source</div>
         </div>
-        <span class="pl-ev-step">Grading mode</span>
+        <div class="pl-ev-composite">
+          <div class="pl-ev-composite-label">Composite</div>
+          <div class="pl-ev-composite-value">Meets · 14/16</div>
+        </div>
       </div>
 
       <div class="pl-ev-context" id="evContext">
@@ -3694,10 +3720,12 @@
 
     document.querySelectorAll('.pl-rubric-cell').forEach(c => c.classList.remove('active'));
 
+    const statusEl = document.getElementById('rubricStatus');
+
     if (alreadyActive) {
       delete document.body.dataset.activeCriterion;
       delete document.body.dataset.activeLevel;
-      document.getElementById('rubricStatus').textContent = 'Click any level cell to highlight supporting passages below';
+      if (statusEl) statusEl.textContent = 'Click any level cell to highlight supporting passages below';
       resetEvidencePanel();
       return;
     }
@@ -3710,7 +3738,7 @@
     const status = isEmpty
       ? `<strong>${label}</strong> — no passages in Maya's essay support this level yet.`
       : `<strong>${label}</strong> — 2 passages highlighted below.`;
-    document.getElementById('rubricStatus').innerHTML = status;
+    if (statusEl) statusEl.innerHTML = status;
 
     // Populate the right-side evidence capture panel
     renderEvidencePanel(criterion, level);
@@ -3724,7 +3752,8 @@
     document.querySelectorAll('.pl-rubric-cell').forEach(c => c.classList.remove('active'));
     delete document.body.dataset.activeCriterion;
     delete document.body.dataset.activeLevel;
-    document.getElementById('rubricStatus').textContent = 'Click any level cell to highlight supporting passages below';
+    const statusEl = document.getElementById('rubricStatus');
+    if (statusEl) statusEl.textContent = 'Click any level cell to highlight supporting passages below';
     resetEvidencePanel();
   }
 
